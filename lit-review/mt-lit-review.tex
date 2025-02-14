@@ -1,0 +1,186 @@
+
+\documentclass[12pt,a4]{article}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath,amsthm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage[normalem]{ulem}
+\usepackage{enumerate}
+\usepackage{graphicx}%
+\usepackage{datetime,verbatim}
+
+
+% Recommended, but optional, packages for figures and better typesetting:
+\usepackage{microtype}
+\usepackage{subfigure}
+\usepackage{booktabs} % for professional tables
+\usepackage{hyperref}
+
+% Attempt to make hyperref and algorithmic work together better:
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+% Use the following line for the initial blind version submitted for review:
+% \usepackage{icml2021}
+
+%%%%%%%%%%%%%%%%%%%%%    page setup   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\textheight=250truemm \textwidth=185truemm \hoffset=-20truemm
+\voffset=-27truemm
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{{\sf\scriptsize Andriy Sukh}}
+\rhead{{\sf\scriptsize 2024}}
+\chead{{\sf\scriptsize Literature Review
+}}
+\lfoot{}
+\rfoot{}
+\cfoot{\rm\thepage}
+%\pagestyle{myheadings}
+%%\markright{}
+%\markboth{}{}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%   matrix extension  %%%%%%%%
+\makeatletter
+\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+	\hskip -\arraycolsep
+	\let\@ifnextchar\new@ifnextchar
+	\array{#1}}
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newenvironment{solution}{\smallskip\noindent{\it Solution.}\ \rm}
+{\hfill \smallskip}
+
+\newtheorem{problem}{Problem}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   Definitions       %%%%%%%
+
+
+\newcommand\rank{\operatorname{rank}}
+\newcommand{\trace}{\operatorname{tr}}
+\newcommand\grad{\operatorname{grad}}
+
+
+\newcommand{\ov}{\overline}
+\newcommand{\wt}{\widetilde}
+
+\newcommand{\bN}{{\mathbb N}}
+\newcommand{\bR}{{\mathbb R}}
+\newcommand{\bZ}{{\mathbb Z}}
+
+\newcommand{\ba}{{\mathbf a}}
+\newcommand{\bb}{{\mathbf b}}
+\newcommand{\bff}{{\mathbf f}}
+
+\newcommand{\bu}{{\mathbf u}}
+\newcommand{\bv}{{\mathbf v}}
+\newcommand{\bp}{{\mathbf p}}
+\newcommand{\bq}{{\mathbf q}}
+\newcommand{\br}{{\mathbf r}}
+\newcommand{\bx}{{\mathbf x}}
+\newcommand{\by}{{\mathbf y}}
+\newcommand{\bw}{{\mathbf w}}
+
+\newcommand{\cB}{{\mathcal B}}
+\newcommand{\cF}{{\mathcal F}}
+\newcommand{\cG}{{\mathcal G}}
+\newcommand{\cN}{{\mathcal N}}
+\newcommand{\cP}{{\mathcal P}}
+\newcommand{\cT}{{\mathcal T}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+
+
+% \begin{center}
+%   \Large\bf{Miltimodality in multilinguality}
+% 
+
+\begin{center}
+\Large \bf Miltimodality in multilinguality
+\end{center}
+
+% \twocolumn[
+  \begin{@twocolumnfalse}
+    \begin{abstract}
+        This is a review of literature in the area of maltimodality usage for the multi-language understanding.
+        Multimodality in multilinguality explores the convergence of multimodal and multilingual capabilities 
+        in artificial intelligence systems to foster deeper understanding and enhanced adaptability. 
+        This review begins by examining foundational work in improving language representation 
+        for underrepresented languages with a focus on the availbale papers.
+        These papers lay a foundation for understanding how multilingual AI models can be extended 
+        and optimized. They emphasize the need for innovative embedding techniques, diverse linguistic datasets, 
+        and adaptive model architectures to fill the gap between multimodality and multilinguality. 
+        This review will further integrate these insights with multimodal models to propose frameworks 
+        for deeper and more inclusive AI understanding across modalities and languages.
+    \end{abstract}
+  \end{@twocolumnfalse}
+
+  \section{Introduction}
+    \label{submission}
+    The rapid development of large language models (LLMs) has revolutionized the fields of natural language processing 
+    (NLP) and artificial intelligence (AI). However, the dominance of English-centric models has created inbalances 
+    in the representation of underrepresented languages, limiting the inclusivity and accessibility 
+    of these technologies. Multilingual AI seeks to bridge this gap, enabling models to understand 
+    and generate text across diverse languages. At the same time, multimodal AI—integrating text, 
+    vision, and other modalities—offers an opportunity to achieve deeper perception and broader applicability. 
+    The intersection of these domains, multimodality in multilinguality, represents an exciting frontier in AI research.
+
+    This review begins by addressing foundational challenges in multilingual representation, focusing 
+    on recent advances aimed at improving the inclusion of non-Latin script languages in LLMs. 
+    We explore how methods like vocabulary expansion, embedding initialization, and fine-tuning have been 
+    employed to enhance the performance of LLMs for underrepresented languages, using Ukrainian as a case study. 
+    The papers, "From English-Centric to Effective Bilingual: LLMs with Custom Tokenizers for Underrepresented 
+    Languages"[1] and "From Bytes to Borsch: Fine-Tuning Gemma and Mistral for the Ukrainian Language Representation,"[2] 
+    illustrate the potential of targeted interventions in advancing multilingual models.
+
+    Building on these insights, this review aims to connect the progress in multilingual LLMs with 
+    multimodal approaches, exploring how AI systems can leverage advancements in both domains to process 
+    and understand data across languages and modalities. By addressing these interconnected challenges.
+    This work aims to contribute to the development of more inclusive, adaptive, and perceptive AI systems.
+
+  \section{Review}
+    \subsection{Background}
+
+    \subsection{Related Work}
+
+    \subsection{Methodology}
+
+    \subsection{Results}
+
+  \section{Early Work}
+    \label{submission}
+
+  \section{Conclusion}
+    \label{submission}
+
+  \section{References}
+    \label{submission}
+    \begin{itemize}
+        \item[1] From English-Centric to Effective Bilingual: LLMs with Custom Tokenizers for Underrepresented Languages. arXiv:2410.18836v1 [cs.CL] 24 Oct 2024
+        \item[2] From Bytes to Borsch: Fine-Tuning Gemma and Mistral for the Ukrainian Language Representation. arXiv:2404.09138v1 [cs.CL] 14 Apr 2024
+    \end{itemize}
+
+
+    
+    
+    
+
+% ]
+
+
+
+\end{document}
