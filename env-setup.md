@@ -29,3 +29,6 @@ To add the conda env to Jupyter as a new kernel
 ## Install
 > chmod +x install.sh
 > ./install.sh 
+
+git config --global user.email "andriy.suh@gmail.com"
+git config --global user.name "Andriy Sukh"

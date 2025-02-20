@@ -1,5 +1,8 @@
 #!/bin/bash
 
+sudo apt update
+sudo apt install -y build-essential
+
 ENV_NAME=$(grep "name:" conda.yaml | awk '{print $2}')
 
 source ~/miniconda3/bin/activate
