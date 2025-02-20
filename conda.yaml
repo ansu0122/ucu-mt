@@ -1,0 +1,24 @@
+name: python3.10-mt
+channels:
+  - defaults
+dependencies:
+  - python=3.10.14
+  - pip
+  - pip:
+    - ipykernel
+    - numpy==1.26.4
+    - matplotlib
+    - pillow
+    - torch==2.6.0
+    - torchvision
+    - tqdm
+    - huggingface_hub 
+    - datasets
+    - transformers
+    - faiss-gpu==1.7.2
+    - wandb
+    - python-dotenv
+    - unsloth
+
+
+    
