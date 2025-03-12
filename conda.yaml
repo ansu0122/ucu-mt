@@ -1,4 +1,4 @@
-name: python3.10-mt
+name: python3.10-mt-vlm
 channels:
   - defaults
 dependencies:
@@ -9,16 +9,15 @@ dependencies:
     - numpy
     - matplotlib
     - pillow
-    - torch
+    - torch==2.6.0
     - torchvision
-    - tqdm
-    - huggingface_hub 
+    - huggingface_hub
     - datasets
     - transformers
     - wandb
     - python-dotenv
     - bitsandbytes
     - unsloth
-
-
-    
+    - langchain
+    - langchain_openai
+    - markdown2
