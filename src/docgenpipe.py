@@ -67,7 +67,10 @@ class ArticleSections(BaseModel):
     section_3_content: str = Field(description="Релевантні дані або додаткові деталі")
 
     table_title: str = Field(description="Заголовок для таблиці")
-    table_content: str = Field(description="Розгорнута таблиця на основі ключових даних в форматі HTML")
+    table_content: str = Field(description=f"Розгорнута таблиця з {random.choice([2, 3, 4])} стовпцями і принаймні {random.choice([2, 3, 4, 5, 6])} рядками на основі ключових даних в форматі HTML")
+
+    svg_chart_title: str = Field(description="Заголовок для SVG-візуалізації")
+    svg_chart: str = Field(description="SVG-візуалізація, що відображає ключові дані чи ілюструє тему")
 
 def generate_content(llm, title, adstract, content) -> ArticleSections:
     """
@@ -87,7 +90,7 @@ def generate_content(llm, title, adstract, content) -> ArticleSections:
     
     **Контент:** {content}
 
-    Згенеруй структуровані розділи та таблицю з чіткими **заголовками** та **вмістом**.
+    Згенеруй структуровані розділи, таблицю та візуалізацію з чіткими **заголовками** та **вмістом**.
     - **Заголовки** мають бути **чіткі та описові**.
     - **Контент** має бути **структурований, базуватись на фактах і доречний**.
     - **Не додавай непотрібних представлень** — переходь відразу до ключових пунктів.
@@ -124,57 +127,53 @@ def load_templates(template_dir="dataset/templates"):
 
     return templates
 
+def load_styles(style_dir="dataset/templates/styles"):
+    """
+    Loads all Markdown templates from the specified directory.
+    Returns a dictionary where keys are filenames (without .md) and values are the content.
+    """
+    styles = {}
+
+    for filename in os.listdir(style_dir):
+        if filename.endswith(".html"):
+            template_name = os.path.splitext(filename)[0]
+            with open(os.path.join(style_dir, filename), "r", encoding="utf-8") as f:
+                styles[template_name] = f.read()
+
+    return styles
+
 class MarkdownSummary(BaseModel):
     markdown_content: str = Field(description="Markdown контент зі структурованими розділами")
 
 def generate_summary(title: str, abstract: str, content: dict):
     TEMPLATES = load_templates()
+    STYLES = load_styles()
 
     selected_template_name = random.choice(list(TEMPLATES.keys()))
     selected_template = TEMPLATES[selected_template_name]
+    selected_style_name = random.choice(list(STYLES.keys()))
+    selected_style = STYLES[selected_style_name]
 
-    print(f"Using template: {selected_template_name}")
+
+    print(f"Using template: {selected_template_name} and style: {selected_style_name}")
 
     content.update({"title": title, "abstract": abstract})
 
     for key, value in content.items():
         selected_template = selected_template.replace(f"{{{key}}}", str(value))
 
-    return selected_template
+    return selected_style.replace('{content}', selected_template)
 
 
 # --- Step 5: Save Markdown as PDF & PNG ---
 def save_as_pdf(markdown_text, output_dir, filename):
     pdf_path = os.path.join(output_dir, f"{filename}.pdf")
     raw_html = markdown(markdown_text)
-    html_content = f"""
-    <html>
-    <head>
-        <style>
-            body {{
-                width: 100%;
-                margin: 0;
-                padding: 0;
-            }}
-            .wrapper {{
-                max-width: 900px;
-                margin: auto;
-                padding: 20px;
-            }}
-        </style>
-    </head>
-    <body>
-        <div class="wrapper">
-            {raw_html}
-        </div>
-    </body>
-    </html>
-    """
 
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page()
-        page.set_content(html_content)
+        page.set_content(raw_html)
         page.pdf(path=pdf_path, format="A4", landscape=False, print_background=True)
         browser.close()
 
@@ -184,49 +183,16 @@ def save_as_png(markdown_text, output_dir, filename):
     png_path = os.path.join(output_dir, f"{filename}.png")
     raw_html = markdown(markdown_text)
 
-    html_content = f"""
-    <html>
-    <head>
-        <style>
-            body {{
-                width: 100%;
-                margin: 0;
-                padding: 0;
-            }}
-            .wrapper {{
-                max-width: 900px;
-                margin: auto;
-                padding: 10px;
-            }}
-            table, th, td {{
-                border: 1px solid black;
-                border-collapse: collapse;
-            }}
-            th, td {{
-                padding: 8px;
-                text-align: left;
-            }}
-        </style>
-    </head>
-    <body>
-        <div class="wrapper">
-            {raw_html}
-        </div>
-    </body>
-    </html>
-    """
-
     with sync_playwright() as p:
         browser = p.chromium.launch()
+        browser = p.chromium.launch()
+        # page = browser.new_page(viewport={"width": 1000, "height": 700})  # Adjust width and height
         page = browser.new_page()
-        page.set_content(html_content)
-        page.screenshot(path=png_path, full_page=True)
+        page.set_content(raw_html)
+        page.screenshot(path=png_path, full_page=True, scale='css')
         browser.close()
 
     return png_path
-
-
-
 
 # --- Step 6: Process JSONL and Save Results ---
 def process_jsonl(input_file, output_file, llm_model, output_dir):
@@ -236,7 +202,7 @@ def process_jsonl(input_file, output_file, llm_model, output_dir):
     records = read_jsonl(input_file)
     processed_records = []
 
-    for i, record in enumerate(records[:1]):
+    for i, record in enumerate(records[:10]):
         print(f"Processing record {i+1}/{len(records)}: {record.get('title', 'Unknown Title')}")
 
         title = record.get("title", "")
