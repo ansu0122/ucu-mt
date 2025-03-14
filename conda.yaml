@@ -21,3 +21,6 @@ dependencies:
     - langchain
     - langchain_openai
     - markdown2
+    - einops
+    - transformers_stream_generator
+    - accelerate

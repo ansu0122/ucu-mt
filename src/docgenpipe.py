@@ -10,51 +10,15 @@ from langchain_core.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, Field
 from typing import List
 from dotenv import load_dotenv
+import uuid
 
 load_dotenv()
 
-# --- Step 1: Read JSONL Records ---
+
 def read_jsonl(input_file):
     with open(input_file, "r", encoding="utf-8") as f:
         return [json.loads(line) for line in f]
 
-# --- Step 2: Read Markdown Tables ---
-def read_markdown_tables(table_paths):
-    tables = []
-    for path in table_paths:
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                tables.append(f.read())
-        except FileNotFoundError:
-            print(f"Warning: Table file {path} not found.")
-    return tables
-
-# --- Step 3: Simplify Tables with LLM ---
-class SimplifiedTable(BaseModel):
-    html_table: str = Field(description="Simplified HTML table version of the original.")
-
-def simplify_table(llm, table_data):
-    parser = PydanticOutputParser(pydantic_object=SimplifiedTable)
-
-    prompt_template = """
-    Маючи наступну таблицю в форматі HTML:
-    {table_data}
-
-    Спрости її зберігаючи наявну інформацію. Позбудься непортібних тегів і атрибутів.
-    Переконайся, що таблиця читабельна.
-    Відформатуй результат як JSON використовуючи наступну схему:\n{format_instructions}
-    """
-
-    prompt = PromptTemplate(
-        input_variables=["table_data"],
-        template=prompt_template,
-        partial_variables={"format_instructions": parser.get_format_instructions()}
-    )
-
-    chain = prompt | llm | parser
-    return chain.invoke({"table_data": table_data}).html_table
-
-# --- Step 4: Generate Markdown Summary ---
 
 class ArticleSections(BaseModel):
     section_1_title: str = Field(description="Заголовок для огляду теми")
@@ -99,7 +63,7 @@ def generate_content(llm, title, adstract, content) -> ArticleSections:
     """
 
     prompt = PromptTemplate(
-        input_variables=["title", "article_text", "wiki_url"],
+        input_variables=["title", "adstract", "content"],
         template=prompt_template,
         partial_variables={"format_instructions": parser.get_format_instructions()}
     )
@@ -142,8 +106,6 @@ def load_styles(style_dir="dataset/templates/styles"):
 
     return styles
 
-class MarkdownSummary(BaseModel):
-    markdown_content: str = Field(description="Markdown контент зі структурованими розділами")
 
 def generate_summary(title: str, abstract: str, content: dict):
     TEMPLATES = load_templates()
@@ -162,10 +124,9 @@ def generate_summary(title: str, abstract: str, content: dict):
     for key, value in content.items():
         selected_template = selected_template.replace(f"{{{key}}}", str(value))
 
-    return selected_style.replace('{content}', selected_template)
+    return selected_style.replace('{content}', selected_template), selected_style_name, selected_template
 
 
-# --- Step 5: Save Markdown as PDF & PNG ---
 def save_as_pdf(markdown_text, output_dir, filename):
     pdf_path = os.path.join(output_dir, f"{filename}.pdf")
     raw_html = markdown(markdown_text)
@@ -178,6 +139,7 @@ def save_as_pdf(markdown_text, output_dir, filename):
         browser.close()
 
     return pdf_path
+
 
 def save_as_png(markdown_text, output_dir, filename):
     png_path = os.path.join(output_dir, f"{filename}.png")
@@ -194,41 +156,74 @@ def save_as_png(markdown_text, output_dir, filename):
 
     return png_path
 
-# --- Step 6: Process JSONL and Save Results ---
-def process_jsonl(input_file, output_file, llm_model, output_dir):
+
+def process_jsonl(input_file, output_file, llm_model, output_dir, chunk_size = 10):
     os.makedirs(output_dir, exist_ok=True)
     llm = ChatOpenAI(model=llm_model)
+    output_path = os.path.join(output_dir, output_file)
 
-    records = read_jsonl(input_file)
-    processed_records = []
+    records = read_jsonl(input_file)[:10] # For testing purposes
+    outputs = []
 
-    for i, record in enumerate(records[:10]):
-        print(f"Processing record {i+1}/{len(records)}: {record.get('title', 'Unknown Title')}")
+    for chunk_start in range(0, len(records), chunk_size):
+        chunk_end = min(chunk_start + chunk_size, len(records))
+        chunk = records[chunk_start:chunk_end]
 
-        title = record.get("title", "")
-        abstract = record.get("abstract", "")
-        content = record.get("content", abstract)
+        for i, record in enumerate(chunk, start=chunk_start):
+            print(f"Processing record {i+1}/{len(records)}: {record.get('title', 'Unknown Title')}")
 
-        # Generate structured content sections using LLM
-        gen_content = generate_content(llm, title, abstract, content)
+            title = record.get("title", "")
+            abstract = record.get("abstract", "")
+            content = record.get("content", abstract)
+            category = record.get("category", "")
 
-        markdown_content = generate_summary(title, abstract, gen_content.model_dump())
+            gen_content = generate_content(llm, title, abstract, content).model_dump()
 
-        filename = f"{title.replace(' ', '_')}_{i+1}"
-        png_path = save_as_png(markdown_content, output_dir, filename)
+            markdown_content, style, template = generate_summary(title, abstract, gen_content)
 
-        record["summary_markdown"] = markdown_content
-        record["png_path"] = png_path
-        processed_records.append(record)
+            filename = uuid.uuid4().hex
+            png_path = save_as_png(markdown_content, os.path.join(output_dir, 'images'), filename)
 
-    with open(output_file, "w", encoding="utf-8") as f:
-        for record in processed_records:
-            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+            outputs.append(create_output_record(
+                category=category,
+                title=title,
+                abstract=abstract,
+                gen_content=gen_content,
+                png_path=png_path,
+                style=style,
+                template=template
+            ))
 
-    print(f"Processed {len(records)} records. Results saved to {output_file}")
+        with open(output_path, "a", encoding="utf-8") as f:
+            for output in outputs:
+                f.write(json.dumps(output, ensure_ascii=False) + "\n")
+        print(f"Processed {len(outputs)} records. Results saved to {output_path}")
+        outputs.clear()
+    
+
+def create_output_record(**kwargs):
+    gen_content = kwargs.get("gen_content", {})  # Store once instead of repeating
+
+    output = {
+        "category": kwargs.get("category", ""),
+        "title": kwargs.get("title", ""),
+        "abst": kwargs.get("abstract", ""),
+        "sec1_title": gen_content.get("section_1_title", ""),
+        "sec1_content": gen_content.get("section_1_content", ""),
+        "sec2_title": gen_content.get("section_2_title", ""),
+        "sec2_content": gen_content.get("section_2_content", ""),
+        "sec3_title": gen_content.get("section_3_title", ""),
+        "sec3_content": gen_content.get("section_3_content", ""),
+        "table_title": gen_content.get("table_title", ""),
+        "table_content": gen_content.get("table_content", ""),
+        "png_path": kwargs.get("png_path", ""),
+        "style": kwargs.get("style", ""),
+        "template": kwargs.get("template", "")
+    }
+    return output
+   
 
 
-# --- Main Execution ---
 if __name__ == "__main__":
     # parser = argparse.ArgumentParser(description="Process Wikipedia JSONL records and generate summaries.")
     # parser.add_argument('--input_file', type=str, required=True, help="Path to input JSONL file")
@@ -247,9 +242,10 @@ if __name__ == "__main__":
 
     process_jsonl(
         input_file="dataset/economy_articles_filtered.jsonl",
-        output_file="economy_processed.jsonl",
+        output_file="metadata.jsonl",
         llm_model="gpt-4o",
-        output_dir="dataset"
+        output_dir="dataset",
+        chunk_size = 1
     )
 
     # python src/datagenpipe.py \
