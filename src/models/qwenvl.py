@@ -1,46 +1,61 @@
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, AutoProcessor
+from transformers import Qwen2VLForConditionalGeneration, AutoProcessor
 from PIL import Image
 from langchain.llms.base import LLM
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
 from typing import Optional, List, Mapping, Any, Union
 
-model_name = "Qwen/Qwen-VL-Chat"
-
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-processor = AutoProcessor.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", device_map="auto")
-
 class QwenVL2_LLM(LLM):
-    def __init__(self, model, tokenizer, processor):
-        self.model = model
-        self.tokenizer = tokenizer
-        self.processor = processor
+    def __init__(self, model_name: str = "Qwen/Qwen2-VL-7B-Instruct", max_new_tokens: int = 512):
+        """
+        Initializes the Qwen-VL model for vision-language processing.
+        """
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.max_new_tokens = max_new_tokens
+
+        self.model = Qwen2VLForConditionalGeneration.from_pretrained(
+            model_name, torch_dtype="auto", device_map="auto", trust_remote_code=True
+        ).to(self.device)
+        self.processor = AutoProcessor.from_pretrained(model_name, trust_remote_code=True)
 
     @property
     def _llm_type(self) -> str:
-        return "Qwen-VL2"
+        return "Qwen2-VL"
 
     def _call(self, prompt: str, image: Optional[Union[str, Image.Image]] = None, stop: Optional[List[str]] = None) -> str:
+        """
+        Generates a response based on a text prompt and an optional image.
+
+        :param prompt: User's question or instruction
+        :param image: Path to an image or a PIL image object
+        :return: Generated response from the model
+        """
+
         if isinstance(image, str):
             image = Image.open(image)
 
-        inputs = self.processor(text=prompt, images=image, return_tensors="pt").to("cuda")
-        
-        outputs = self.model.generate(**inputs, max_new_tokens=512)
-        response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        conversation = [
+            {"role": "user", "content": [{"type": "image"}, {"type": "text", "text": prompt}]}
+        ]
 
-        return response
+        text_prompt = self.processor.apply_chat_template(conversation, add_generation_prompt=True)
+
+        inputs = self.processor(text=[text_prompt], images=[image], padding=True, return_tensors="pt").to(self.device)
+
+        self.model.to(self.device)
+
+        output_ids = self.model.generate(**inputs, max_new_tokens=self.max_new_tokens)
+
+        generated_ids = [output_ids[len(input_ids):] for input_ids, output_ids in zip(inputs.input_ids, output_ids)]
+        output_text = self.processor.batch_decode(generated_ids, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+
+        return output_text[0] if output_text else ""
 
     @property
     def _identifying_params(self) -> Mapping[str, Any]:
         return {"model_name": self.model.name_or_path}
 
 
-llm = QwenVL2_LLM(model, tokenizer, processor)
-
-def call_inference_pipe(image_path: str, question: str) -> str:
+def call_inference_pipe(llm: LLM, image_path: str, question: str) -> str:
     """
     Calls the Qwen-VL2 model with an image and a text prompt.
 
@@ -48,19 +63,15 @@ def call_inference_pipe(image_path: str, question: str) -> str:
     :param question: Text prompt for the model
     :return: Model's response
     """
-
     response = llm._call(prompt=question, image=image_path)
-    print("Response (Direct Model Call):", response)
-
-    prompt = PromptTemplate.from_template("Analyze this image and answer: {question}")
-    chain = LLMChain(llm=llm, prompt=prompt)
     
-    response_chain = chain.run({"question": question})
-    print("Response (LangChain Pipeline):", response_chain)
+    return response
 
-    return response_chain
 
 if __name__ == "__main__":
+    llm = QwenVL2_LLM()
+
     image_path = "../../dataset/Економіка_1.png"
-    question = "What is in this image?"
-    call_inference_pipe(image_path, question)
+    question = "Витягни таблицю із зображення в HTML форматі?"
+
+    response = call_inference_pipe(llm, image_path, question)
