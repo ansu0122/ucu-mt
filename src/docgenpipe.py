@@ -1,9 +1,10 @@
 import os
+import re
 import json
 import argparse
 import random
 from markdown2 import markdown
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, Page
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
@@ -19,6 +20,10 @@ def read_jsonl(input_file):
     with open(input_file, "r", encoding="utf-8") as f:
         return [json.loads(line) for line in f]
 
+def clean_html(html):
+    html = re.sub(r'class="[^"]*"', '', html)
+    html = re.sub(r'\n\s*', ' ', html)
+    return html.strip()
 
 class ArticleSections(BaseModel):
     section_1_title: str = Field(description="Заголовок для огляду теми")
@@ -31,7 +36,7 @@ class ArticleSections(BaseModel):
     section_3_content: str = Field(description="Релевантні дані або додаткові деталі")
 
     table_title: str = Field(description="Заголовок для таблиці")
-    table_content: str = Field(description=f"Розгорнута таблиця з {random.choice([2, 3, 4])} стовпцями і принаймні {random.choice([2, 3, 4, 5, 6])} рядками на основі ключових даних в форматі HTML")
+    table_content: str = Field(description=f"Розгорнута таблиця з {random.choice([4])} стовпцями і принаймні {random.choice([2, 3, 4, 5, 6])} рядками на основі ключових даних в форматі HTML")
 
     svg_chart_title: str = Field(description="Заголовок для SVG-візуалізації")
     svg_chart: str = Field(description="SVG-візуалізація, що відображає ключові дані чи ілюструє тему")
@@ -76,7 +81,7 @@ def generate_content(llm, title, adstract, content) -> ArticleSections:
         "content": content
     })
 
-def load_templates(template_dir="dataset/templates"):
+def load_templates(template_dir="templates"):
     """
     Loads all Markdown templates from the specified directory.
     Returns a dictionary where keys are filenames (without .md) and values are the content.
@@ -91,7 +96,7 @@ def load_templates(template_dir="dataset/templates"):
 
     return templates
 
-def load_styles(style_dir="dataset/templates/styles"):
+def load_styles(style_dir="templates/styles"):
     """
     Loads all Markdown templates from the specified directory.
     Returns a dictionary where keys are filenames (without .md) and values are the content.
@@ -107,24 +112,23 @@ def load_styles(style_dir="dataset/templates/styles"):
     return styles
 
 
-def generate_summary(title: str, abstract: str, content: dict):
-    TEMPLATES = load_templates()
-    STYLES = load_styles()
+def generate_summary(title: str, abstract: str, content: dict, template_dir: str):
+    TEMPLATES = load_templates(template_dir)
+    STYLES = load_styles(os.path.join(template_dir, 'styles'))
 
     selected_template_name = random.choice(list(TEMPLATES.keys()))
     selected_template = TEMPLATES[selected_template_name]
     selected_style_name = random.choice(list(STYLES.keys()))
     selected_style = STYLES[selected_style_name]
 
-
     print(f"Using template: {selected_template_name} and style: {selected_style_name}")
 
     content.update({"title": title, "abstract": abstract})
-
+    template = selected_template
     for key, value in content.items():
-        selected_template = selected_template.replace(f"{{{key}}}", str(value))
+        template = template.replace(f"{{{key}}}", str(value))
 
-    return selected_style.replace('{content}', selected_template), selected_style_name, selected_template
+    return selected_style.replace('{content}', template), selected_style_name, selected_template
 
 
 def save_as_pdf(markdown_text, output_dir, filename):
@@ -151,13 +155,78 @@ def save_as_png(markdown_text, output_dir, filename):
         # page = browser.new_page(viewport={"width": 1000, "height": 700})  # Adjust width and height
         page = browser.new_page()
         page.set_content(raw_html)
+        grounding = find_bounding_box(page)
         page.screenshot(path=png_path, full_page=True, scale='css')
         browser.close()
 
-    return png_path
+    return png_path, grounding
 
 
-def process_jsonl(input_file, output_file, llm_model, output_dir, chunk_size = 10):
+def find_bounding_box(page: Page):
+    bounding_boxes = page.evaluate('''
+        () => {
+            const classNames = [
+                "title", "abstract", "table-container", "chart-container", "section-container"
+            ];
+            
+            const typeMapping = {
+                "title": "text",
+                "abstract": "text",
+                "section-container-1": "text",
+                "section-container-2": "text",
+                "section-container-3": "text",
+                "table-container": "table",
+                "chart-container": "chart"
+            };
+
+            let elements = [];
+            const pageWidth = document.documentElement.scrollWidth;
+            const pageHeight = document.documentElement.scrollHeight;
+                                   
+            classNames.forEach(className => {
+                document.querySelectorAll("." + className).forEach(element => {
+                    let rect = element.getBoundingClientRect();
+                    let type = typeMapping[className] || "text";
+
+                    elements.push({
+                    "type": type,
+                    "content": (type === "text" || type === "chart") 
+                            ? element.innerText 
+                            : element.innerHTML
+                                .replace(/\\s*class="[^"]*"/g, "")
+                                .replace(/<\\/?(h1|h2|h3|h4|p)[^>]*>/g, "")
+                                .replace(/\\n+/g, " ")
+                                .replace(/\\s+/g, " ")
+                                .trim(),
+                        "box": {
+                            "l": rect.left / pageWidth,
+                            "t": rect.top / pageHeight,
+                            "r": rect.right / pageWidth,
+                            "b": rect.bottom / pageHeight
+                        }
+                    });
+                });
+            });
+
+            elements.sort((a, b) => {
+                if (a.box.t === b.box.t) {
+                    return a.box.l - b.box.l;
+                }
+                return a.box.t - b.box.t;
+            });
+
+            elements.forEach((element, idx) => {
+                element.index = idx;
+            });
+
+            return elements;
+        }
+    ''')
+
+    return bounding_boxes
+
+
+def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, chunk_size = 10, language = "uk"):
     os.makedirs(output_dir, exist_ok=True)
     llm = ChatOpenAI(model=llm_model)
     output_path = os.path.join(output_dir, output_file)
@@ -179,19 +248,19 @@ def process_jsonl(input_file, output_file, llm_model, output_dir, chunk_size = 1
 
             gen_content = generate_content(llm, title, abstract, content).model_dump()
 
-            markdown_content, style, template = generate_summary(title, abstract, gen_content)
+            markdown_content, style, template = generate_summary(title, abstract, gen_content, template_dir)
 
             filename = uuid.uuid4().hex
-            png_path = save_as_png(markdown_content, os.path.join(output_dir, 'images'), filename)
+            png_path, grounding = save_as_png(markdown_content, os.path.join(output_dir, 'images'), filename)
 
             outputs.append(create_output_record(
+                lang=language,
                 category=category,
                 title=title,
-                abstract=abstract,
-                gen_content=gen_content,
                 png_path=png_path,
                 style=style,
-                template=template
+                template=clean_html(template),
+                grounding=grounding
             ))
 
         with open(output_path, "a", encoding="utf-8") as f:
@@ -202,23 +271,14 @@ def process_jsonl(input_file, output_file, llm_model, output_dir, chunk_size = 1
     
 
 def create_output_record(**kwargs):
-    gen_content = kwargs.get("gen_content", {})  # Store once instead of repeating
-
     output = {
+        "lang": kwargs.get("lang", "en"),
         "category": kwargs.get("category", ""),
         "title": kwargs.get("title", ""),
-        "abst": kwargs.get("abstract", ""),
-        "sec1_title": gen_content.get("section_1_title", ""),
-        "sec1_content": gen_content.get("section_1_content", ""),
-        "sec2_title": gen_content.get("section_2_title", ""),
-        "sec2_content": gen_content.get("section_2_content", ""),
-        "sec3_title": gen_content.get("section_3_title", ""),
-        "sec3_content": gen_content.get("section_3_content", ""),
-        "table_title": gen_content.get("table_title", ""),
-        "table_content": gen_content.get("table_content", ""),
         "png_path": kwargs.get("png_path", ""),
         "style": kwargs.get("style", ""),
-        "template": kwargs.get("template", "")
+        "template": kwargs.get("template", ""),
+        "grounding": kwargs.get("grounding", [])
     }
     return output
    
@@ -241,11 +301,13 @@ if __name__ == "__main__":
     # )
 
     process_jsonl(
-        input_file="dataset/economy_articles_filtered.jsonl",
-        output_file="metadata.jsonl",
         llm_model="gpt-4o",
+        input_file="data/economy_articles_filtered.jsonl",
+        output_file="metadata.jsonl",
         output_dir="dataset",
-        chunk_size = 1
+        template_dir="assets/templates",
+        chunk_size = 1,
+        language = "uk"
     )
 
     # python src/datagenpipe.py \

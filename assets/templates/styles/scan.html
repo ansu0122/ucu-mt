@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Serif:wght@400;700&family=PT+Serif:wght@400;700&display=swap');
+
+            body {
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: start;
+                font-family: "Special Elite", "IBM Plex Serif", "PT Serif", serif;
+                font-size: 20px;
+                background: #f8f1e4;
+            }
+
+            .wrapper {
+                padding: 20px;
+                margin: 15px auto;
+                display: inline-block;
+                width: auto;
+                height: auto;
+                max-width: 95%;
+                background: #f8f1e4;
+                box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
+                border-radius: 5px;
+                filter: contrast(95%) grayscale(20%) blur(0.2px);
+                background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
+            }
+
+            .content-container {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .title-container, .section-container, .chart-container, .table-container {
+                margin-top: 0px;
+                margin-bottom: 0px;
+            }
+
+            .title {
+                font-family: "PT Serif", "IBM Plex Serif", serif;
+                font-size: 36px;
+                text-align: center;
+                margin-bottom: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: #3a2e1f;
+                text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+            }
+
+            .abstract {
+                font-size: 24px;
+                line-height: 1.5;
+                text-align: justify;
+                color: #4b3e2a;
+                opacity: 0.9;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .section-title {
+                font-family: "PT Serif", "IBM Plex Serif", serif;
+                font-size: 28px;
+                margin-bottom: 4px;
+                text-transform: uppercase;
+                font-weight: 700;
+                color: #3a2e1f;
+            }
+
+            .section-content {
+                font-size: 22px;
+                line-height: 1.7;
+                text-align: justify;
+                margin-top: 0px;
+                color: #4b3e2a;
+                text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.1);
+                filter: blur(0.2px);
+            }
+
+            .chart-container {
+                text-align: center;
+                align-items: center;
+            }
+
+            .svg-chart {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                margin-top: 10px;
+                margin-bottom: 4px;
+                filter: sepia(15%) contrast(85%) blur(0.2px);
+            }
+
+            .svg-chart-title {
+                font-style: italic;
+                font-size: 26px;
+                margin-top: 4px;
+                margin-bottom: 10px;
+                text-align: center;
+                color: #4b3e2a;
+            }
+
+            .table-container {
+                text-align: center;
+                width: 100%;
+                overflow-x: auto; /* Enables horizontal scrolling if necessary */
+                display: flex;
+                flex-direction: column; /* Stack title and table */
+                align-items: center;
+                padding: 10px;
+            }
+            
+            .table-title {
+                font-style: italic;
+                font-size: 26px;
+                margin-top: 10px;
+                margin-bottom: 4px;
+                color: #4b3e2a;
+                text-align: center;
+                width: 100%;
+            }
+            
+            table {
+                margin-left: auto;
+                margin-right: auto;
+                border: 1px solid rgba(0, 0, 0, 0.4);
+                border-collapse: collapse;
+                font-size: clamp(16px, 2vw, 22px); /* Responsive font size */
+                width: 100%;
+                max-width: 100%; /* Ensures table fits within the container */
+                table-layout: auto; /* Allows columns to adjust dynamically */
+                font-family: "Special Elite", "IBM Plex Serif", "PT Serif", serif;
+                background-color: #f8f1e4;
+            }
+            
+            th, td {
+                border: 1px solid rgba(0, 0, 0, 0.3);
+                color: #4b3e2a;
+                padding: 10px;
+                text-align: left;
+                word-wrap: break-word;
+                word-break: break-word; /* Ensures text does not overflow */
+                overflow: hidden;
+                font-size: clamp(14px, 1.8vw, 20px); /* Prevents large text from breaking */
+            }
+            
+            /* Fix first column width */
+            th:first-child,
+            td:first-child {
+                min-width: auto; /* Ensures the first column does not get too small */
+                max-width: auto; /* Prevents excessive stretching */
+                white-space: normal; /* Allows text wrapping */
+            }
+
+            .wrapper::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image: url('https://www.transparenttextures.com/patterns/noisy.png');
+                opacity: 0.08;
+                pointer-events: none;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            {content}
+        </div>
+    </body>
+</html>
