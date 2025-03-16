@@ -280,7 +280,7 @@ def create_output_record(**kwargs):
         "lang": kwargs.get("lang", "en"),
         "category": kwargs.get("category", ""),
         "title": kwargs.get("title", ""),
-        "png_path": kwargs.get("png_path", ""),
+        "image": kwargs.get("png_path", ""),
         "style": kwargs.get("style", ""),
         "template": kwargs.get("template", ""),
         "grounding": kwargs.get("grounding", [])
