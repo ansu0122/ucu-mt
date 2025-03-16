@@ -130,5 +130,44 @@ def fetch_all_articles(category, language="uk", batch_size=10, max_articles=50, 
     return total_fetched
 
 if __name__ == "__main__":
-    total = fetch_all_articles("Політика", language="uk", batch_size=10, max_articles=50, output_file="politics_articles_filtered.jsonl")
-    print(f"Saved {total} articles to physics_articles_filtered.jsonl")
+    output_file="data/economy.jsonl"
+    total = fetch_all_articles("Економіка", language="uk", batch_size=10, max_articles=100, output_file=output_file)
+    print(f"Saved {total} articles to {output_file}")
+
+    output_file="data/politics.jsonl"
+    total = fetch_all_articles("Політика", language="uk", batch_size=10, max_articles=100, output_file=output_file)
+    print(f"Saved {total} articles to {output_file}")
+
+    output_file="data/literature.jsonl"
+    total = fetch_all_articles("Література", language="uk", batch_size=10, max_articles=100, output_file=output_file)
+    print(f"Saved {total} articles to {output_file}")
+
+    output_file="data/science.jsonl"
+    total = fetch_all_articles("Наука", language="uk", batch_size=10, max_articles=100, output_file=output_file)
+    print(f"Saved {total} articles to {output_file}")
+
+    output_file="data/art.jsonl"
+    total = fetch_all_articles("Мистецтво", language="uk", batch_size=10, max_articles=100, output_file=output_file)
+    print(f"Saved {total} articles to {output_file}")
+
+    output_file="data/education.jsonl"
+    total = fetch_all_articles("Освіта", language="uk", batch_size=10, max_articles=100, output_file=output_file)
+    print(f"Saved {total} articles to {output_file}")
+
+    output_file="data/healthcare.jsonl"
+    total = fetch_all_articles("Медицина", language="uk", batch_size=10, max_articles=100, output_file=output_file)
+    print(f"Saved {total} articles to {output_file}")
+
+    output_file="data/finance.jsonl"
+    total = fetch_all_articles("Фінанси", language="uk", batch_size=10, max_articles=100, output_file=output_file)
+    print(f"Saved {total} articles to {output_file}")
+
+    output_file="data/coding.jsonl"
+    total = fetch_all_articles("Програмування", language="uk", batch_size=10, max_articles=100, output_file=output_file)
+    print(f"Saved {total} articles to {output_file}")
+
+    output_file="data/math.jsonl"
+    total = fetch_all_articles("Математика", language="uk", batch_size=10, max_articles=100, output_file=output_file)
+    print(f"Saved {total} articles to {output_file}")
+
+

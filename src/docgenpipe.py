@@ -326,7 +326,7 @@ if __name__ == "__main__":
 
     process_jsonl(
         llm_model="gpt-4o",
-        input_file="data/economy_articles_filtered.jsonl",
+        input_file="data/economy.jsonl",
         output_file="metadata.jsonl",
         output_dir="dataset",
         template_dir="assets/templates",
