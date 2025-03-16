@@ -5,49 +5,15 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 
-def distort_gs(image_path, output_path):
-    """Applies a subtle scanned document effect using OpenCV with mild distortion."""
-    
-    # Load image in grayscale mode
-    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+def distort_cv2(image_path):
+    """Applies a moderate scanned document effect—balancing distortion, noise, and readability."""
 
-    # Apply a very light Gaussian Blur (softens without destroying text clarity)
-    blurred = cv2.GaussianBlur(image, (3, 3), 1)
-
-    # Slight Perspective Warping to simulate scanning misalignment
-    rows, cols = blurred.shape
-    src_points = np.float32([[0, 0], [cols-1, 0], [0, rows-1], [cols-1, rows-1]])
-    dst_points = np.float32([[3, 2], [cols-5, 2], [2, rows-3], [cols-2, rows-4]])  # Less extreme warp
-
-    matrix = cv2.getPerspectiveTransform(src_points, dst_points)
-    warped = cv2.warpPerspective(blurred, matrix, (cols, rows))
-
-    # Add very mild noise (to simulate light scan grain)
-    noise = np.random.normal(0, 8, warped.shape).astype(np.uint8)  # Lower noise level
-    noisy_image = cv2.add(warped, noise)
-
-    # Light contrast adjustment to maintain readability
-    alpha = 1.2  # Mild contrast control
-    beta = 5     # Slight brightness boost
-    scanned_effect = cv2.convertScaleAbs(noisy_image, alpha=alpha, beta=beta)
-
-    # Save the final processed image
-    cv2.imwrite(output_path, scanned_effect)
-    
-    return output_path
-
-def distort_cv(image_path):
-    """Applies a moderate scanned document effect with salt & pepper noise while keeping table lines visible."""
-    
-    # Load image in original color format
     image = cv2.imread(image_path)
 
-    # Apply a milder Gaussian Blur (reducing intensity to keep table lines visible)
-    blurred = cv2.GaussianBlur(image, (3, 3), 0.5)
+    blurred = cv2.GaussianBlur(image, (3, 3), 0.8)
 
-    # Randomized Light Perspective Warping (reducing intensity)
     rows, cols, _ = blurred.shape
-    distortion_range = random.uniform(1, 3)  # Lower distortion
+    distortion_range = random.uniform(2, 5)
 
     src_points = np.float32([[0, 0], [cols-1, 0], [0, rows-1], [cols-1, rows-1]])
     dst_points = np.float32([
@@ -60,38 +26,40 @@ def distort_cv(image_path):
     matrix = cv2.getPerspectiveTransform(src_points, dst_points)
     warped = cv2.warpPerspective(blurred, matrix, (cols, rows))
 
-    # Add random noise with reduced intensity
-    noise_intensity = random.randint(3, 8)  # Lower noise strength
+    # add moderate noise (grain effect)
+    noise_intensity = random.randint(4, 10)
     noise = np.random.normal(0, noise_intensity, warped.shape).astype(np.uint8)
-    noisy_image = cv2.addWeighted(warped, 0.98, noise, 0.02, 0)  # 2% noise blending
+    noisy_image = cv2.addWeighted(warped, 0.95, noise, 0.1, 0)
 
-     # Introduce random local warping to distort edges slightly
+    # local warping for an authentic scan effect
     map_x, map_y = np.meshgrid(np.arange(cols), np.arange(rows), indexing="xy")
-    displacement = random.randint(1, 2)
-    map_x = (map_x + np.sin(map_y / 30) * displacement).astype(np.float32)
-    map_y = (map_y + np.sin(map_x / 30) * displacement).astype(np.float32)
-    warped = cv2.remap(warped, map_x, map_y, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+    displacement = random.randint(1, 2)  # Moderate local distortion
+    map_x = (map_x + np.sin(map_y / 60) * displacement).astype(np.float32)
+    map_y = (map_y + np.sin(map_x / 60) * displacement).astype(np.float32)
+    warped = cv2.remap(noisy_image, map_x, map_y, interpolation=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
 
-    # Add moderate salt-and-pepper noise
-    salt_pepper_ratio = 0.002  # Less aggressive
-    num_salt = int(salt_pepper_ratio * image.size * 0.5)
-    num_pepper = int(salt_pepper_ratio * image.size * 0.5)
+    # Add slight salt-and-pepper noise
+    # salt_pepper_ratio = 0.004 
+    # num_salt = int(salt_pepper_ratio * image.size * 0.5)
+    # num_pepper = int(salt_pepper_ratio * image.size * 0.5)
 
-    # Add Salt (White Pixels)
-    salt_coords = [np.random.randint(0, i - 1, num_salt) for i in image.shape[:2]]
-    noisy_image[salt_coords[0], salt_coords[1]] = [228, 241, 248]  # Softer white pixels
+    # # Add Salt (White Pixels)
+    # salt_coords = [np.random.randint(0, i - 1, num_salt) for i in image.shape[:2]]
+    # warped[salt_coords[0], salt_coords[1]] = [235, 235, 235]  # Softer white noise
 
     # # Add Pepper (Black Pixels)
     # pepper_coords = [np.random.randint(0, i - 1, num_pepper) for i in image.shape[:2]]
-    # noisy_image[pepper_coords[0], pepper_coords[1]] = [20, 20, 20]  # Softer black pixels
+    # warped[pepper_coords[0], pepper_coords[1]] = [25, 25, 25]  # Softer black noise
 
-    # Reduce contrast & brightness adjustments (to avoid excessive fading)
-    alpha = 1.05  # Lower contrast boost
-    beta = 3  # Minimal brightness shift
-    scanned_effect = cv2.convertScaleAbs(noisy_image, alpha=alpha, beta=beta)
+    # Adjust contrast & brightness moderately
+    alpha = 1.08  # Slight contrast boost
+    beta = 4  # Subtle brightness shift
+    scanned_effect = cv2.convertScaleAbs(warped, alpha=alpha, beta=beta)
 
     cv2.imwrite(image_path, scanned_effect)
+    
     return image_path
+
 
 
 def visualize_grounding(image_path, grounding):

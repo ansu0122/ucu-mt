@@ -13,6 +13,10 @@ from typing import List
 from dotenv import load_dotenv
 import uuid
 import docvision as dv
+from langchain_community.cache import InMemoryCache
+from langchain.globals import set_llm_cache
+
+set_llm_cache(InMemoryCache())
 
 load_dotenv()
 
@@ -37,30 +41,27 @@ class ArticleSections(BaseModel):
     section_3_content: str = Field(description="Релевантні дані або додаткові деталі")
 
     table_title: str = Field(description="Заголовок для таблиці")
-    table_content: str = Field(description=f"Розгорнута таблиця з {random.choice([4])} стовпцями і принаймні {random.choice([2, 3, 4, 5, 6])} рядками на основі ключових даних в форматі HTML")
+    table_content: str = Field(description=f"Розгорнута таблиця з {random.choice([2, 3, 4])} стовпцями і принаймні {random.choice([2, 3, 4, 5, 6])} рядками на основі ключових даних в форматі HTML")
 
-    svg_chart_title: str = Field(description="Заголовок для SVG-візуалізації")
-    svg_chart: str = Field(description="SVG-візуалізація, що відображає ключові дані чи ілюструє тему")
+    svg_chart_title: str = Field(description="Заголовок для графiку")
+    svg_chart: str = Field(description="Графiк у форматі SVG, що відображає ключову інформацію")
 
-def generate_content(llm, title, adstract, content) -> ArticleSections:
+def generate_content(llm, title, content) -> ArticleSections:
     """
     Uses LLM to generate structured content sections with titles based on:
     - Article Title
     - Full Article Text
-    - Wikipedia URL for external reference
     """
     parser = PydanticOutputParser(pydantic_object=ArticleSections)
 
     prompt_template = """
-    На основі наступної статті:
+    На основі контенту наступної статті:
 
     **Заголовок:** {title}
     
-    **Вступ:** {adstract}
-    
     **Контент:** {content}
 
-    Згенеруй структуровані розділи, таблицю та візуалізацію з чіткими **заголовками** та **вмістом**.
+    Згенеруй **Українською мовою** структуровані розділи, таблицю та візуалізацію з чіткими **заголовками** та **вмістом**.
     - **Заголовки** мають бути **чіткі та описові**.
     - **Контент** має бути **структурований, базуватись на фактах і доречний**.
     - **Не додавай непотрібних представлень** — переходь відразу до ключових пунктів.
@@ -69,16 +70,14 @@ def generate_content(llm, title, adstract, content) -> ArticleSections:
     """
 
     prompt = PromptTemplate(
-        input_variables=["title", "adstract", "content"],
+        input_variables=["title", "content"],
         template=prompt_template,
         partial_variables={"format_instructions": parser.get_format_instructions()}
     )
 
-    content = prompt | llm | parser
-
-    return content.invoke({
+    pipe = prompt | llm | parser
+    return pipe.invoke({
         "title": title,
-        "adstract": adstract,
         "content": content
     })
 
@@ -152,46 +151,66 @@ def save_as_png(markdown_text, output_dir, filename):
 
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        browser = p.chromium.launch()
-        # page = browser.new_page(viewport={"width": 1000, "height": 700})  # Adjust width and height
-        page = browser.new_page()
+        page = browser.new_page(
+            viewport={
+                "width": 1280, 
+                "height": 800, 
+                "deviceScaleFactor": 1
+            }
+        )
         page.set_content(raw_html)
+        page.wait_for_timeout(1000)
+
+        # Get bounding boxes with absolute coordinates
         grounding = find_bounding_box(page)
+
+        # Capture full-page screenshot
         page.screenshot(path=png_path, full_page=True, scale='css')
         browser.close()
 
     return png_path, grounding
 
-
 def find_bounding_box(page: Page):
     bounding_boxes = page.evaluate('''
         () => {
             const classNames = [
-                "title", "abstract", "table-container", "chart-container", "section-container"
+                "title-container", 
+                "table-container", 
+                "chart-container", 
+                "section-container"
             ];
             
             const typeMapping = {
-                "title": "text",
-                "abstract": "text",
-                "section-container-1": "text",
-                "section-container-2": "text",
-                "section-container-3": "text",
+                "title-container": "text",
+                "section-container": "text",
                 "table-container": "table",
                 "chart-container": "chart"
             };
 
-            let elements = [];
+            // For normalization
             const pageWidth = document.documentElement.scrollWidth;
             const pageHeight = document.documentElement.scrollHeight;
-                                   
+
+            // Scroll offsets for absolute positioning
+            const scrollX = window.scrollX;
+            const scrollY = window.scrollY;
+
+            let elements = [];
+
             classNames.forEach(className => {
                 document.querySelectorAll("." + className).forEach(element => {
                     let rect = element.getBoundingClientRect();
                     let type = typeMapping[className] || "text";
 
+                    // Calculate absolute positions by adding scroll offsets
+                    let absoluteLeft = rect.left + scrollX;
+                    let absoluteTop = rect.top + scrollY;
+                    let absoluteRight = rect.right + scrollX;
+                    let absoluteBottom = rect.bottom + scrollY;
+
                     elements.push({
-                    "type": type,
-                    "content": (type === "text" || type === "chart") 
+                        "type": type,
+                        "content": (type === "text" || type === "chart") 
                             ? element.innerText 
                             : element.innerHTML
                                 .replace(/\\s*class="[^"]*"/g, "")
@@ -200,20 +219,21 @@ def find_bounding_box(page: Page):
                                 .replace(/\\s+/g, " ")
                                 .trim(),
                         "box": {
-                            "l": rect.left / pageWidth,
-                            "t": rect.top / pageHeight,
-                            "r": rect.right / pageWidth,
-                            "b": rect.bottom / pageHeight
+                            "l": absoluteLeft / pageWidth,
+                            "t": absoluteTop / pageHeight,
+                            "r": absoluteRight / pageWidth,
+                            "b": absoluteBottom / pageHeight
                         }
                     });
                 });
             });
 
+            // Sort elements by left and top positions
             elements.sort((a, b) => {
-                if (a.box.t === b.box.t) {
-                    return a.box.l - b.box.l;
+                if (a.box.l === b.box.l) {
+                    return a.box.t - b.box.t;
                 }
-                return a.box.t - b.box.t;
+                return a.box.l - b.box.l;
             });
 
             elements.forEach((element, idx) => {
@@ -223,17 +243,16 @@ def find_bounding_box(page: Page):
             return elements;
         }
     ''')
-
     return bounding_boxes
 
 
 
 def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, chunk_size = 10, language = "uk"):
     os.makedirs(output_dir, exist_ok=True)
-    llm = ChatOpenAI(model=llm_model)
+    llm = ChatOpenAI(model=llm_model, cache=True)
     output_path = os.path.join(output_dir, output_file)
 
-    records = read_jsonl(input_file)[:10] # For testing purposes
+    records = read_jsonl(input_file)
     outputs = []
 
     for chunk_start in range(0, len(records), chunk_size):
@@ -248,7 +267,7 @@ def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, 
             content = record.get("content", abstract)
             category = record.get("category", "")
 
-            gen_content = generate_content(llm, title, abstract, content).model_dump()
+            gen_content = generate_content(llm, title, content).model_dump()
 
             markdown_content, style, template = generate_summary(title, abstract, gen_content, template_dir)
 
@@ -256,13 +275,13 @@ def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, 
             png_path, grounding = save_as_png(markdown_content, os.path.join(output_dir, 'images'), filename)
 
             if style == "scan":
-                png_path = dv.distort_cv(png_path)
+                png_path = dv.distort_cv2(png_path)
 
             outputs.append(create_output_record(
                 lang=language,
                 category=category,
                 title=title,
-                png_path=png_path,
+                png_path=png_path.removeprefix("dataset/"),
                 style=style,
                 template=clean_html(template),
                 grounding=grounding
@@ -311,7 +330,7 @@ if __name__ == "__main__":
         output_file="metadata.jsonl",
         output_dir="dataset",
         template_dir="assets/templates",
-        chunk_size = 1,
+        chunk_size = 10,
         language = "uk"
     )
 

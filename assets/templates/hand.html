@@ -2,25 +2,25 @@
 <html>
     <head>
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=PT+Serif:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Neucha&family=Patrick+Hand&family=Schoolbell&display=swap');
 
             body {
+                display: block;
                 margin: 0;
                 padding: 0;
-                display: flex;
                 justify-content: center;
                 align-items: start;
-                font-family: "Times New Roman", "PT Serif", "Noto Serif", "Roboto Slab", serif;
+                font-family: "Patrick Hand", "Caveat", "Neucha", "Schoolbell", cursive;
                 font-size: 20px;
             }
 
             .wrapper {
-                padding: 15px;
-                margin: 15px auto;
-                display: inline-block;
+                display: block;
                 width: auto;
                 height: auto;
-                max-width: 100%;
+                max-width: 100%; /* or whatever max width you like */
+                padding: 15px;
+                margin: 15px auto;
                 background: white;
             }
 
@@ -30,15 +30,21 @@
             }
 
             .title-container, .section-container, .chart-container, .table-container {
-                margin-top: 0px;
-                margin-bottom: 0px;
+                display: block;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                padding-left: 2px;
+                padding-right: 2px;
+                padding-top: 0px;
+                padding-bottom: 0px;
             }
 
             .title {
-                font-family: "PT Serif", "Times New Roman", serif;
+                font-family: "Patrick Hand", "Caveat", cursive;
                 font-size: 36px;
                 text-align: center;
-                margin-bottom: 10px;
+                margin-bottom: 6px;
+                text-transform: uppercase;
             }
 
             .abstract {
@@ -48,7 +54,7 @@
             }
 
             .section-title {
-                font-family: "PT Serif", "Times New Roman", serif;
+                font-family: "Patrick Hand", "Caveat", cursive;
                 font-size: 28px;
                 margin-bottom: 4px;
             }
@@ -61,14 +67,19 @@
             }
 
             .chart-container {
+                display: block;
+                margin-left: 0px;
+                margin-right: 0px;
+                padding-left: auto;
+                padding-right: auto;
                 text-align: center;
                 align-items: center;
             }
 
             .svg-chart {
                 display: block;
-                margin-left: auto;
-                margin-right: auto;
+                margin-left: 0px;
+                margin-right: 0px;
                 margin-top: 10px;
                 margin-bottom: 4px;
             }
@@ -88,13 +99,12 @@
                 display: flex;
                 flex-direction: column; /* Stack title and table */
                 align-items: center;
-                padding: 10px;
             }
 
             .table-title {
                 font-style: italic;
                 font-size: 26px;
-                margin-top: 10px;
+                margin-top: 4px;
                 margin-bottom: 6px;
                 text-align: center;
                 width: 100%;
@@ -104,7 +114,6 @@
                 margin-left: auto;
                 margin-right: auto;
                 border: 0.5px solid black;
-                font-family: "Noto Serif", "PT Serif", "Roboto Slab", serif;
                 border-collapse: collapse;
                 font-size: clamp(16px, 2vw, 22px); /* Responsive font size */
                 width: 100%;
@@ -116,13 +125,11 @@
                 border: 0.5px solid black;
                 padding: 10px;
                 text-align: left;
-                font-family: "Noto Serif", "PT Serif", "Roboto Slab", serif;
                 word-wrap: break-word;
                 word-break: break-word; /* Ensures text does not overflow */
                 overflow: hidden;
                 font-size: clamp(14px, 1.8vw, 20px); /* Prevents large text from breaking */
             }
-
             /* Fix first column width */
             th:first-child,
             td:first-child {

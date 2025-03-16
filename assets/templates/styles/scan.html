@@ -5,29 +5,56 @@
             @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Serif:wght@400;700&family=PT+Serif:wght@400;700&display=swap');
 
             body {
-                margin: 0;
-                padding: 0;
-                display: flex;
+                display: block;
                 justify-content: center;
                 align-items: start;
+                margin: 0;
+                padding: 0;
                 font-family: "Special Elite", "IBM Plex Serif", "PT Serif", serif;
                 font-size: 20px;
                 background: #f8f1e4;
             }
-
+            
             .wrapper {
-                padding: 20px;
-                margin: 15px auto;
-                display: inline-block;
+                display: block;
                 width: auto;
-                height: auto;
                 max-width: 95%;
+                padding: 20px;
+                margin: 30px auto;
                 background: #f8f1e4;
-                box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.3);
-                border-radius: 5px;
-                filter: contrast(95%) grayscale(20%) blur(0.2px);
+                box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2),
+                            inset 0px 0px 10px rgba(0, 0, 0, 0.05);
+                border-radius: 3px;
+                filter: contrast(98%) grayscale(15%) blur(0.3px);
                 background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
+                background-size: cover;
+                position: relative;
             }
+            
+            .wrapper::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(255, 255, 255, 0.03);
+                mix-blend-mode: multiply;
+                pointer-events: none;
+            }
+            
+            .wrapper::after {
+                content: "";
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                width: calc(100% + 4px);
+                height: calc(100% + 4px);
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.15); /* Soft glow instead of a border */
+                border-radius: 5px;
+                opacity: 0.6;
+                pointer-events: none;
+            }            
 
             .content-container {
                 display: flex;
@@ -35,15 +62,20 @@
             }
 
             .title-container, .section-container, .chart-container, .table-container {
-                margin-top: 0px;
-                margin-bottom: 0px;
+                display: block;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                padding-left: 2px;
+                padding-right: 2px;
+                padding-top: 0px;
+                padding-bottom: 0px;
             }
 
             .title {
                 font-family: "PT Serif", "IBM Plex Serif", serif;
                 font-size: 36px;
                 text-align: center;
-                margin-bottom: 10px;
+                margin-bottom: 6px;
                 font-weight: 700;
                 text-transform: uppercase;
                 letter-spacing: 1px;
@@ -81,14 +113,19 @@
             }
 
             .chart-container {
+                display: block;
+                margin-left: 0px;
+                margin-right: 0px;
+                padding-left: auto;
+                padding-right: auto;
                 text-align: center;
                 align-items: center;
             }
 
             .svg-chart {
                 display: block;
-                margin-left: auto;
-                margin-right: auto;
+                margin-left: 0px;
+                margin-right: 0px;
                 margin-top: 10px;
                 margin-bottom: 4px;
                 filter: sepia(15%) contrast(85%) blur(0.2px);
@@ -110,7 +147,6 @@
                 display: flex;
                 flex-direction: column; /* Stack title and table */
                 align-items: center;
-                padding: 10px;
             }
             
             .table-title {
