@@ -2,6 +2,8 @@
 
 sudo apt update
 sudo apt install -y build-essential
+sudo apt install git-lfs
+git lfs install
 
 ENV_NAME=$(grep "name:" conda.yaml | awk '{print $2}')
 
