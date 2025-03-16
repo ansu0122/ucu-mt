@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 from typing import List
 from dotenv import load_dotenv
 import uuid
+import docvision as dv
 
 load_dotenv()
 
@@ -226,6 +227,7 @@ def find_bounding_box(page: Page):
     return bounding_boxes
 
 
+
 def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, chunk_size = 10, language = "uk"):
     os.makedirs(output_dir, exist_ok=True)
     llm = ChatOpenAI(model=llm_model)
@@ -252,6 +254,9 @@ def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, 
 
             filename = uuid.uuid4().hex
             png_path, grounding = save_as_png(markdown_content, os.path.join(output_dir, 'images'), filename)
+
+            if style == "scan":
+                png_path = dv.distort_cv(png_path)
 
             outputs.append(create_output_record(
                 lang=language,
