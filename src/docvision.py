@@ -62,13 +62,11 @@ def distort_cv2(image_path):
 
 
 
-def visualize_grounding(image_path, grounding):
-    # Load the image
-    image = cv2.imread(image_path)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB for proper display
+def visualize_grounding(image: Image, grounding: list):
+    """Visualizes the grounding information on the image."""
+    image = np.array(image)
     h, w, _ = image.shape
     
-    # Create a figure
     plt.figure(figsize=(10, 10))
     plt.imshow(image)
     
@@ -77,15 +75,10 @@ def visualize_grounding(image_path, grounding):
         type = item['type']
 
         color = {"text": "green", "table": "blue", "chart": "red"}
-        
-        # Convert normalized coordinates to pixel values
         l, t, r, b = box['l'] * w, box['t'] * h, box['r'] * w, box['b'] * h
-        
-        # Draw the rectangle
         plt.gca().add_patch(plt.Rectangle((l, t), r - l, b - t, 
                                           edgecolor=color[type], linewidth=1, fill=False))
         
-        # Put text label
         plt.text(l, t - 5, type[:30] + ('...' if len(type) > 30 else ''), 
                  color=color[type], fontsize=8)
     
