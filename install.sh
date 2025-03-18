@@ -4,6 +4,7 @@ sudo apt update
 sudo apt install -y build-essential
 sudo apt install git-lfs
 git lfs install
+sudo apt install -y libgl1 libglib2.0-0 ffmpeg
 
 ENV_NAME=$(grep "name:" conda.yaml | awk '{print $2}')
 

@@ -26,3 +26,4 @@ dependencies:
     - accelerate
     - opencv-python
     - langchain-community
+    - playwright

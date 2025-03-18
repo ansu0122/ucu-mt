@@ -5,16 +5,16 @@ from langchain.llms.base import LLM
 from typing import Optional, List, Mapping, Any, Union
 
 class QwenVL2_LLM(LLM):
-    def __init__(self, model_name: str = "Qwen/Qwen2-VL-7B-Instruct", max_new_tokens: int = 512):
+    def __init__(self, model_name: str = "Qwen/Qwen2-VL-7B-Instruct", max_new_tokens: int = 1024, device = "cuda"):
         """
         Initializes the Qwen-VL model for vision-language processing.
         """
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        # self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.max_new_tokens = max_new_tokens
 
         self.model = Qwen2VLForConditionalGeneration.from_pretrained(
             model_name, torch_dtype="auto", device_map="auto", trust_remote_code=True
-        ).to(self.device)
+        ).to(device)
         self.processor = AutoProcessor.from_pretrained(model_name, trust_remote_code=True)
 
     @property
@@ -70,8 +70,3 @@ def call_inference_pipe(llm: LLM, image_path: str, question: str) -> str:
 
 if __name__ == "__main__":
     llm = QwenVL2_LLM()
-
-    image_path = "../../dataset/Економіка_1.png"
-    question = "Витягни таблицю із зображення в HTML форматі?"
-
-    response = call_inference_pipe(llm, image_path, question)

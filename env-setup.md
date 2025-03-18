@@ -32,3 +32,5 @@ To add the conda env to Jupyter as a new kernel
 
 git config --global user.email "andriy.suh@gmail.com"
 git config --global user.name "Andriy Sukh"
+
+du -sh /root/.cache/huggingface/hub/*
