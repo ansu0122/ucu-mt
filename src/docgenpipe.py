@@ -3,6 +3,7 @@ import re
 import json
 import argparse
 import random
+from itertools import islice
 from markdown2 import markdown
 from playwright.sync_api import sync_playwright, Page
 from langchain_openai import ChatOpenAI
@@ -15,11 +16,26 @@ import uuid
 import docvision as dv
 from langchain_community.cache import InMemoryCache
 from langchain.globals import set_llm_cache
+from datasets import load_dataset
 
 set_llm_cache(InMemoryCache())
-
 load_dotenv()
 
+
+def get_table(buffer_size=5000):
+    if not hasattr(get_table, "buffer"):
+        print("Loading tables buffer...")
+        ds_stream = load_dataset('ds4sd/PubTables-1M_OTSL-v1.1', split='train', streaming=True)
+        get_table.buffer = list(islice(ds_stream, buffer_size))
+        print(f"Buffer loaded with {len(get_table.buffer)} records.")
+
+    return random.choice(get_table.buffer)
+
+def prettify_table(token_list):
+    cleaned = ''.join(token.strip(" '\"\t\n,") for token in token_list)
+    if '<table' not in cleaned.lower():
+        cleaned = f"<table>{cleaned}</table>"
+    return cleaned
 
 def read_jsonl(input_file):
     with open(input_file, "r", encoding="utf-8") as f:
@@ -41,7 +57,10 @@ class ArticleSections(BaseModel):
     section_3_content: str = Field(description="Релевантні дані або додаткові деталі")
 
     table_title: str = Field(description="Заголовок для таблиці")
-    table_content: str = Field(description=f"Розгорнута таблиця з {random.choice([2, 3, 4])} стовпцями і принаймні {random.choice([2, 3, 4, 5, 6])} рядками на основі ключових даних в форматі HTML")
+    table_content: str = Field(description=f"Заповни заголовки стовпців і рядків та порожні клітинки таблиці\
+                               переважно-числовими даними, не змінюючи її структуру \
+                               (кількість рядків, стовпців, rowspan/colspan та інші теги): \
+                               **{prettify_table(get_table().get('html', ''))}**")
 
     svg_chart_title: str = Field(description="Заголовок для графiку")
     svg_chart: str = Field(description="Графiк у форматі SVG, що відображає ключову інформацію")
@@ -252,7 +271,7 @@ def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, 
     llm = ChatOpenAI(model=llm_model, cache=True)
     output_path = os.path.join(output_dir, output_file)
 
-    records = read_jsonl(input_file)
+    records = read_jsonl(input_file)[:1]
     outputs = []
 
     for chunk_start in range(0, len(records), chunk_size):
@@ -305,8 +324,11 @@ def create_output_record(**kwargs):
         "grounding": kwargs.get("grounding", [])
     }
     return output
-   
 
+
+def clean_html_tokens(token_list):
+    cleaned = ''.join(token.strip(" '\"\t\n,") for token in token_list)
+    return cleaned
 
 if __name__ == "__main__":
     # parser = argparse.ArgumentParser(description="Process Wikipedia JSONL records and generate summaries.")
@@ -330,7 +352,7 @@ if __name__ == "__main__":
         output_file="metadata.jsonl",
         output_dir="dataset",
         template_dir="assets/templates",
-        chunk_size = 10,
+        chunk_size = 1,
         language = "uk"
     )
 
