@@ -10,7 +10,7 @@ def distort_cv2(image_path):
 
     image = cv2.imread(image_path)
 
-    blurred = cv2.GaussianBlur(image, (3, 3), 0.8)
+    blurred = cv2.GaussianBlur(image, (3, 3), 0.5)
 
     rows, cols, _ = blurred.shape
     distortion_range = random.uniform(2, 5)
@@ -27,9 +27,9 @@ def distort_cv2(image_path):
     warped = cv2.warpPerspective(blurred, matrix, (cols, rows))
 
     # add moderate noise (grain effect)
-    noise_intensity = random.randint(4, 10)
+    noise_intensity = random.randint(3, 8)  # Lower noise strength
     noise = np.random.normal(0, noise_intensity, warped.shape).astype(np.uint8)
-    noisy_image = cv2.addWeighted(warped, 0.95, noise, 0.1, 0)
+    noisy_image = cv2.addWeighted(warped, 0.98, noise, 0.02, 0)
 
     # local warping for an authentic scan effect
     map_x, map_y = np.meshgrid(np.arange(cols), np.arange(rows), indexing="xy")
