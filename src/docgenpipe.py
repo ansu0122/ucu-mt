@@ -298,7 +298,7 @@ def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, 
     llm = ChatOpenAI(model=llm_model, cache=True)
     output_path = os.path.join(output_dir, output_file)
 
-    records = read_jsonl(input_file)
+    records = read_jsonl(input_file)[:3]
     outputs = []
 
     for chunk_start in range(0, len(records), chunk_size):
@@ -312,8 +312,12 @@ def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, 
             abstract = record.get("abstract", "")
             content = record.get("content", abstract)
             category = record.get("category", "")
-
-            gen_content = generate_content(llm, title, content).model_dump()
+            gen_content=""
+            try:
+                gen_content = generate_content(llm, title, content).model_dump()
+            except Exception as e:
+                print(f"Error generating content: {e}")
+                continue
 
             markdown_content, style, template = generate_summary(title, abstract, gen_content, template_dir)
 
