@@ -298,7 +298,7 @@ def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, 
     llm = ChatOpenAI(model=llm_model, cache=True)
     output_path = os.path.join(output_dir, output_file)
 
-    records = read_jsonl(input_file)[:3]
+    records = read_jsonl(input_file)
     outputs = []
 
     for chunk_start in range(0, len(records), chunk_size):
@@ -349,7 +349,7 @@ def create_output_record(**kwargs):
         "lang": kwargs.get("lang", "en"),
         "category": kwargs.get("category", ""),
         "title": kwargs.get("title", ""),
-        "image": kwargs.get("png_path", ""),
+        "file_name": kwargs.get("png_path", ""),
         "style": kwargs.get("style", ""),
         "template": kwargs.get("template", ""),
         "grounding": kwargs.get("grounding", [])
