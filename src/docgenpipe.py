@@ -65,10 +65,7 @@ class ArticleSections(BaseModel):
     section_3_content: str = Field(description="Релевантні дані або додаткові деталі")
 
     table_title: str = Field(description="Заголовок для таблиці")
-    table_content: str = Field(description=f"Заповни усі заголовки стовпців і рядків та клітинки таблиці\
-                               числовими даними, не змінюючи її структуру \
-                               (кількість рядків, стовпців, rowspan/colspan та інші теги): \
-                               **{prettify_table(get_table().get('html', ''))}**")
+    table_content: str = Field(description="HTML-таблиця з числовими даними")
 
     svg_chart_title: str = Field(description="Заголовок для графiку")
     svg_chart: str = Field(description="Невеликий графiк у форматі SVG, що відображає ключову інформацію")
@@ -78,7 +75,11 @@ def generate_content(llm, title, content) -> ArticleSections:
     Uses LLM to generate structured content sections with titles based on:
     - Article Title
     - Full Article Text
+    - Random table from PubTables
     """
+    table = get_table(n_rows=7, n_cols=8)
+    table_html = prettify_table(table.get('html', ''))
+
     parser = PydanticOutputParser(pydantic_object=ArticleSections)
 
     prompt_template = """
@@ -88,16 +89,22 @@ def generate_content(llm, title, content) -> ArticleSections:
     
     **Контент:** {content}
 
-    Згенеруй **Українською мовою** структуровані розділи, таблицю та візуалізацію з чіткими **заголовками** та **вмістом**.
-    - **Заголовки** мають бути **чіткі та описові**.
-    - **Контент** має бути **структурований, базуватись на фактах і доречний**.
-    - **Не додавай непотрібних представлень** — переходь відразу до ключових пунктів.
+    Заповни **наступну HTML-таблицю (усі заголовки стовпців, рядків і клітинки) числовими даними**, не змінюючи її структуру 
+    (кількість рядків, стовпців, rowspan/colspan та інші теги):
 
-    Відповідь повертай у форматі JSON використовуючи цю схему:\n{format_instructions}
+    {table_html}
+
+    Згенеруй також структуровані розділи та невеликий SVG-графік.
+
+    - **Заголовки** мають бути чіткі та описові.
+    - **Контент** має бути структурований, доречний і фактологічний.
+    - **SVG-графік** має відображати ключову інформацію, пов’язану з темою статті.
+
+    Відповідь повертай у форматі JSON згідно з цією схемою:\n{format_instructions}
     """
 
     prompt = PromptTemplate(
-        input_variables=["title", "content"],
+        input_variables=["title", "content", "table_html"],
         template=prompt_template,
         partial_variables={"format_instructions": parser.get_format_instructions()}
     )
@@ -105,8 +112,10 @@ def generate_content(llm, title, content) -> ArticleSections:
     pipe = prompt | llm | parser
     return pipe.invoke({
         "title": title,
-        "content": content
+        "content": content,
+        "table_html": table_html
     })
+
 
 def load_templates(template_dir="templates"):
     """
@@ -366,7 +375,7 @@ if __name__ == "__main__":
 
     process_jsonl(
         llm_model="gpt-4o",
-        input_file="data/economy.jsonl",
+        input_file="data/politics.jsonl",
         output_file="metadata.jsonl",
         output_dir="dataset",
         template_dir="assets/templates",
