@@ -17,19 +17,27 @@ import docvision as dv
 from langchain_community.cache import InMemoryCache
 from langchain.globals import set_llm_cache
 from datasets import load_dataset
+from PIL import Image
 
 set_llm_cache(InMemoryCache())
 load_dotenv()
 
 
-def get_table(buffer_size=5000):
+def get_table(n_rows: int = 7, n_cols: int = 8, buffer_size=5000):
     if not hasattr(get_table, "buffer"):
         print("Loading tables buffer...")
         ds_stream = load_dataset('ds4sd/PubTables-1M_OTSL-v1.1', split='train', streaming=True)
         get_table.buffer = list(islice(ds_stream, buffer_size))
         print(f"Buffer loaded with {len(get_table.buffer)} records.")
 
-    return random.choice(get_table.buffer)
+    filtered = [
+        table for table in get_table.buffer
+        if (n_rows is None or table.get("rows") <= n_rows) and
+           (n_cols is None or table.get("cols") <= n_cols)
+    ]
+
+    return random.choice(filtered)
+
 
 def prettify_table(token_list):
     cleaned = ''.join(token.strip(" '\"\t\n,") for token in token_list)
@@ -57,13 +65,13 @@ class ArticleSections(BaseModel):
     section_3_content: str = Field(description="Релевантні дані або додаткові деталі")
 
     table_title: str = Field(description="Заголовок для таблиці")
-    table_content: str = Field(description=f"Заповни заголовки стовпців і рядків та порожні клітинки таблиці\
-                               переважно-числовими даними, не змінюючи її структуру \
+    table_content: str = Field(description=f"Заповни усі заголовки стовпців і рядків та клітинки таблиці\
+                               числовими даними, не змінюючи її структуру \
                                (кількість рядків, стовпців, rowspan/colspan та інші теги): \
                                **{prettify_table(get_table().get('html', ''))}**")
 
     svg_chart_title: str = Field(description="Заголовок для графiку")
-    svg_chart: str = Field(description="Графiк у форматі SVG, що відображає ключову інформацію")
+    svg_chart: str = Field(description="Невеликий графiк у форматі SVG, що відображає ключову інформацію")
 
 def generate_content(llm, title, content) -> ArticleSections:
     """
@@ -172,8 +180,8 @@ def save_as_png(markdown_text, output_dir, filename):
         browser = p.chromium.launch()
         page = browser.new_page(
             viewport={
-                "width": 1280, 
-                "height": 800, 
+                "width": 800, 
+                "height": 1100, 
                 "deviceScaleFactor": 1
             }
         )
@@ -188,6 +196,16 @@ def save_as_png(markdown_text, output_dir, filename):
         browser.close()
 
     return png_path, grounding
+
+def save_as_jpeg(markdown_text, output_dir, filename, quality=85):
+    png_path, grounding = save_as_png(markdown_text, output_dir, filename)
+    jpg_path = os.path.join(output_dir, f"{filename}.jpg")
+    # Convert PNG to JPEG
+    image = Image.open(png_path).convert("RGB")
+    image.save(jpg_path, "JPEG", quality=quality)
+    os.remove(png_path)
+
+    return jpg_path, grounding
 
 def find_bounding_box(page: Page):
     bounding_boxes = page.evaluate('''
@@ -271,7 +289,7 @@ def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, 
     llm = ChatOpenAI(model=llm_model, cache=True)
     output_path = os.path.join(output_dir, output_file)
 
-    records = read_jsonl(input_file)[:1]
+    records = read_jsonl(input_file)
     outputs = []
 
     for chunk_start in range(0, len(records), chunk_size):
@@ -291,7 +309,7 @@ def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, 
             markdown_content, style, template = generate_summary(title, abstract, gen_content, template_dir)
 
             filename = uuid.uuid4().hex
-            png_path, grounding = save_as_png(markdown_content, os.path.join(output_dir, 'images'), filename)
+            png_path, grounding = save_as_jpeg(markdown_content, os.path.join(output_dir, 'images'), filename)
 
             if style == "scan":
                 png_path = dv.distort_cv2(png_path)
@@ -352,7 +370,7 @@ if __name__ == "__main__":
         output_file="metadata.jsonl",
         output_dir="dataset",
         template_dir="assets/templates",
-        chunk_size = 1,
+        chunk_size = 10,
         language = "uk"
     )
 
