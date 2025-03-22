@@ -163,7 +163,7 @@ cython_debug/
 
 .DS_Store
 dataset*/
-data*/
+
 
 !dataset/.git
 !dataset/.gitattributes
