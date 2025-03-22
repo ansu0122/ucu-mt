@@ -20,11 +20,12 @@ dependencies:
     - unsloth
     - langchain
     - langchain_openai
+    - langchain-ollama
+    - langchain-community
     - markdown2
     - einops
     - transformers_stream_generator
     - accelerate
     - opencv-python
-    - langchain-community
     - playwright
     - python-Levenshtein

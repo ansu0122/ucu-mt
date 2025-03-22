@@ -7,6 +7,7 @@ from itertools import islice
 from markdown2 import markdown
 from playwright.sync_api import sync_playwright, Page
 from langchain_openai import ChatOpenAI
+from langchain_ollama.chat_models import ChatOllama
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, Field
@@ -293,9 +294,8 @@ def find_bounding_box(page: Page):
 
 
 
-def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, chunk_size = 10, language = "uk"):
+def process_jsonl(llm, input_file, output_file, output_dir, template_dir, chunk_size = 10, language = "uk"):
     os.makedirs(output_dir, exist_ok=True)
-    llm = ChatOpenAI(model=llm_model, cache=True)
     output_path = os.path.join(output_dir, output_file)
 
     records = read_jsonl(input_file)
@@ -377,9 +377,12 @@ if __name__ == "__main__":
     #     output_dir=args.output_dir
     # )
 
+    # llm = ChatOpenAI(model="gpt-4o", num_ctx=20000, cache=True)
+    llm = ChatOllama(model="qwen2.5:14b", num_ctx=20000)
+
     process_jsonl(
-        llm_model="gpt-4o",
-        input_file="data/politics.jsonl",
+        llm=llm,
+        input_file="data/coding.jsonl",
         output_file="metadata.jsonl",
         output_dir="dataset",
         template_dir="assets/templates",

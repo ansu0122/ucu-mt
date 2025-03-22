@@ -167,3 +167,6 @@ dataset*/
 
 !dataset/.git
 !dataset/.gitattributes
+
+!docugen/.git
+!docugen/.gitattributes

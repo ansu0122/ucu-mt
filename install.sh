@@ -5,6 +5,11 @@ sudo apt install -y build-essential
 sudo apt install git-lfs
 git lfs install
 sudo apt install -y libgl1 libglib2.0-0 ffmpeg
+playwright install-deps
+playwright install
+
+# sudo apt install -y curl git build-essential libssl-dev libclang-dev pkg-config
+# curl -fsSL https://ollama.com/install.sh | sh
 
 ENV_NAME=$(grep "name:" conda.yaml | awk '{print $2}')
 
