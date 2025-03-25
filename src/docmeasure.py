@@ -1,14 +1,67 @@
+import re
 import numpy as np
 from Levenshtein import distance
 from bs4 import BeautifulSoup
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+
 def calculate_cer(gt_text, ocr_text):
     edit_distance = distance(gt_text, ocr_text)
     cer = edit_distance / max(1, len(gt_text))
     return cer
 
+
+def mean_cer(ground_truth: list, predictions: dict) -> float:
+    
+    matches = _match_gt_results(ground_truth, predictions)
+
+    total_cer = sum(
+        calculate_cer(match['ground_truth'], match['prediction'])
+        for match in matches
+    )
+    return total_cer / len(matches) if matches else 0.0
+
+
+def _normalize_text(text):
+    text = text.lower()
+    text = re.sub(r"[^\w\s]", "", text)  # Remove punctuation
+    text = re.sub(r"\s+", " ", text).strip()  # Normalize whitespace
+    return text
+
+
+def calculate_wer(gt_text, ocr_text):
+    gt_words = _normalize_text(gt_text).split()
+    ocr_words = _normalize_text(ocr_text).split()
+
+    edit_distance = distance(" ".join(gt_words), " ".join(ocr_words))
+    wer = edit_distance / max(1, len(gt_words))
+    return wer
+
+
+def mean_wer(ground_truth: list, predictions: dict) -> float:
+    matches = _match_gt_results(ground_truth, predictions)
+
+    total_wer = sum(
+        calculate_wer(match['ground_truth'], match['prediction'])
+        for match in matches
+    )
+    return total_wer / len(matches) if matches else 0.0
+
+
+def _match_gt_results(ground_truth: list, prediction: dict):
+    comparisons = []
+    for record in ground_truth:
+        doc_id = record["id"]
+        gt = record["content"]
+        ocr = prediction.get(doc_id, "")
+        comparisons.append({
+            "id": doc_id,
+            "ground_truth": gt,
+            "prediction": ocr
+        })
+
+    return comparisons
 
 class TreeNode:
     """Represents a node in a tree."""
