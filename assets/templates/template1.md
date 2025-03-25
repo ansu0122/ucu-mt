@@ -22,9 +22,9 @@
             <h3 class="section-title">{section_3_title}</h3>
             <p class="section-content">{section_3_content}</p>
         </div>
-        <div class="table-container">
-            <h4 class="table-title">Таблиця: {table_title}</h4>
-            <p class="section-content">{table_content}</p>
-        </div>
     </div>
+</div>
+<div class="table-container">
+    <h4 class="table-title">Таблиця: {table_title}</h4>
+    <p class="section-content">{table_content}</p>
 </div>
