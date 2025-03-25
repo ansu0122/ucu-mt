@@ -334,7 +334,8 @@ def process_jsonl(llm_model, input_file, output_file, output_dir, template_dir, 
                 png_path=png_path.removeprefix("dataset/"),
                 style=style,
                 template=clean_html(template),
-                grounding=grounding
+                grounding=grounding,
+                id = filename
             ))
 
         with open(output_path, "a", encoding="utf-8") as f:
@@ -352,7 +353,8 @@ def create_output_record(**kwargs):
         "file_name": kwargs.get("png_path", ""),
         "style": kwargs.get("style", ""),
         "template": kwargs.get("template", ""),
-        "grounding": kwargs.get("grounding", [])
+        "grounding": kwargs.get("grounding", []),
+        "id": kwargs.get("id", "")
     }
     return output
 
@@ -379,7 +381,7 @@ if __name__ == "__main__":
 
     process_jsonl(
         llm_model="gpt-4o",
-        input_file="data/politics.jsonl",
+        input_file="data/west_art.jsonl",
         output_file="metadata.jsonl",
         output_dir="dataset",
         template_dir="assets/templates",
