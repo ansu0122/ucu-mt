@@ -182,7 +182,7 @@ if __name__ == "__main__":
     # total = fetch_all_articles("Математика", language="uk", batch_size=10, max_articles=100, output_file=output_file)
     # print(f"Saved {total} articles to {output_file}")
 
-    output_file="data/west_art.jsonl"
-    total = fetch_all_articles("Західне мистецтво", language="uk", batch_size=10, max_articles=100, output_file=output_file)
+    output_file="data/natural_resources.jsonl"
+    total = fetch_all_articles("Природні ресурси", language="uk", batch_size=10, max_articles=120, output_file=output_file)
     print(f"Saved {total} articles to {output_file}")
 

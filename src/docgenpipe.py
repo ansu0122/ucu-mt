@@ -381,7 +381,7 @@ if __name__ == "__main__":
 
     process_jsonl(
         llm_model="gpt-4o",
-        input_file="data/west_art.jsonl",
+        input_file="data/space.jsonl",
         output_file="metadata.jsonl",
         output_dir="dataset",
         template_dir="assets/templates",
