@@ -5,8 +5,7 @@ from tqdm import tqdm
 import json
 
 from pydantic import BaseModel, Field, ValidationError
-from transformers import AutoProcessor
-from transformers import Qwen2VLForConditionalGeneration
+from unsloth import FastVisionModel
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import PromptTemplate
 
@@ -40,39 +39,59 @@ def build_doc_extraction_prompt(parser: PydanticOutputParser) -> str:
 
 
 class QwenVL2_LLM:
-    def __init__(self, model_name="Qwen/Qwen2-VL-7B-Instruct", max_new_tokens=1024, device="cuda"):
+    def __init__(
+        self,
+        model_name: str = "unsloth/Qwen2-VL-7B-Instruct",
+        max_new_tokens: int = 1024,
+        device: str = "cuda",
+        load_in_4bit: bool = True,
+        use_gradient_checkpointing: Union[bool, str] = "unsloth"
+    ):
         self.max_new_tokens = max_new_tokens
         self.device = device
 
-        self.model = Qwen2VLForConditionalGeneration.from_pretrained(
+        # Load model + tokenizer via Unsloth
+        self.model, self.tokenizer = FastVisionModel.from_pretrained(
             model_name,
-            torch_dtype="auto",
-            device_map="auto",
-            trust_remote_code=True
-        ).to(device)
+            load_in_4bit=load_in_4bit,
+            use_gradient_checkpointing=use_gradient_checkpointing,
+        )
 
-        self.processor = AutoProcessor.from_pretrained(model_name, trust_remote_code=True)
+        self.model.to(device)
+        FastVisionModel.for_inference(self.model)
 
-    def generate(self, prompt: str, image: Image.Image) -> str:
-        conversation = [
-            {"role": "user", "content": [{"type": "image"}, {"type": "text", "text": prompt}]}
+    def generate(self, prompt: str, image: Union[str, Image.Image], **generation_args) -> str:
+        if isinstance(image, str):
+            image = Image.open(image).convert("RGB")
+
+        messages = [
+            {"role": "user", "content": [
+                {"type": "image"},
+                {"type": "text", "text": prompt}
+            ]}
         ]
-        text_prompt = self.processor.apply_chat_template(conversation, add_generation_prompt=True)
 
-        inputs = self.processor(
-            text=[text_prompt],
-            images=[image],
-            padding=True,
+        input_text = self.tokenizer.apply_chat_template(messages, add_generation_prompt=True)
+
+        inputs = self.tokenizer(
+            image,
+            input_text,
+            add_special_tokens=False,
             return_tensors="pt"
         ).to(self.device)
 
-        output_ids = self.model.generate(**inputs, max_new_tokens=self.max_new_tokens)
-        generated_ids = [output_ids[len(input_ids):] for input_ids, output_ids in zip(inputs.input_ids, output_ids)]
-        output_text = self.processor.batch_decode(
-            generated_ids, skip_special_tokens=True, clean_up_tokenization_spaces=True
+        gen_args = dict(
+            max_new_tokens=self.max_new_tokens,
+            use_cache=True,
+            temperature=1.0,
+            do_sample=False,
+            **generation_args
         )
 
-        return output_text[0] if output_text else ""
+        output = self.model.generate(**inputs, **gen_args)
+        decoded = self.tokenizer.batch_decode(output, skip_special_tokens=True, clean_up_tokenization_spaces=True)
+
+        return decoded[0] if decoded else ""
 
 
 def process_doc_image(image: Image, model: QwenVL2_LLM) -> Optional[AnswerSchema]:
