@@ -63,26 +63,48 @@ def distort_cv2(image_path):
 
 
 def visualize_grounding(image: Image, grounding: list):
-    """Visualizes the grounding information on the image."""
+    """Visualizes the grounding information on the image with filled boxes."""
     image = np.array(image)
     h, w, _ = image.shape
-    
+
     plt.figure(figsize=(10, 10))
     plt.imshow(image)
-    
+
     for item in grounding:
         box = item['box']
-        type = item['type']
+        type_ = item['type']
 
-        color = {"text": "green", "table": "blue", "chart": "red"}
+        # Define colors for edge and fill
+        color_map = {
+            "text": ("green", "lightgreen"),
+            "table": ("blue", "lightblue"),
+            "chart": ("red", "lightcoral")
+        }
+        edge_color, fill_color = color_map.get(type_, ("black", "gray"))
+
         l, t, r, b = box['l'] * w, box['t'] * h, box['r'] * w, box['b'] * h
-        plt.gca().add_patch(plt.Rectangle((l, t), r - l, b - t, 
-                                          edgecolor=color[type], linewidth=1, fill=False))
-        
-        plt.text(l, t - 5, type[:30] + ('...' if len(type) > 30 else ''), 
-                 color=color[type], fontsize=8)
-    
+        plt.gca().add_patch(
+            plt.Rectangle(
+                (l, t),
+                r - l,
+                b - t,
+                edgecolor=edge_color,
+                facecolor=fill_color,
+                alpha=0.3,
+                linewidth=1
+            )
+        )
+
+        plt.text(
+            l,
+            t - 5,
+            type_[:30] + ('...' if len(type_) > 30 else ''),
+            color=edge_color,
+            fontsize=8
+        )
+
     plt.axis("off")
+    plt.tight_layout()
     plt.show()
 
 
