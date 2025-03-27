@@ -28,3 +28,6 @@ dependencies:
     - langchain-community
     - playwright
     - python-Levenshtein
+    - beautifulsoup4
+    - scikit-learn
+    - zss

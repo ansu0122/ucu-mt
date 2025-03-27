@@ -167,3 +167,5 @@ dataset*/
 
 !dataset/.git
 !dataset/.gitattributes
+
+unsloth*/
