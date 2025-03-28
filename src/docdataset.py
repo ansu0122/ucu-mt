@@ -59,7 +59,7 @@ def extract_gt_content(dataset, style=None, region_types=None) -> list:
         if not isinstance(region_types, list) or not all(rt in valid_types for rt in region_types):
             raise ValueError("region_types must be a list containing one or more of: 'text', 'table', 'chart'")
 
-    results = []
+    results = {}
     for example in dataset:
         if style is not None and example.get("style") not in style:
             continue
@@ -72,14 +72,58 @@ def extract_gt_content(dataset, style=None, region_types=None) -> list:
         ]
         joined_content = "\n\n".join(text_segments).strip()
 
-        results.append({
-            "id": example["id"],
-            "category": example["category"],
-            "style": example["style"],
-            "content": joined_content
-        })
+        results[example["id"]] = joined_content
+    return results
+
+import re
+
+def extract_gt_titles(dataset, style=None, region_types=None) -> dict:
+    """
+    Extract ground-truth titles from dataset based on optional style and region type filters.
+
+    Args:
+        dataset: Hugging Face Dataset object.
+        style (list or None): List of styles to include (e.g. ['print', 'scan']), or None to include all.
+        region_types (list): List of region types to include (e.g. ['text', 'table']).
+
+    Returns:
+        Dict mapping id to comma-separated titles string.
+    """
+    valid_styles = {"print", "hand", "scan"}
+    valid_types = {"text", "table", "chart"}
+
+    if style is not None:
+        if not isinstance(style, list) or not all(s in valid_styles for s in style):
+            raise ValueError("style must be a list containing one or more of: 'print', 'hand', 'scan'")
+
+    if region_types is not None:
+        if not isinstance(region_types, list) or not all(rt in valid_types for rt in region_types):
+            raise ValueError("region_types must be a list containing one or more of: 'text', 'table', 'chart'")
+
+    results = {}
+
+    for example in dataset:
+        if style is not None and example.get("style") not in style:
+            continue
+
+        grounding = example.get("grounding", [])
+        titles = []
+
+        for region in grounding:
+            if region_types is not None and region.get("type") not in region_types:
+                continue
+
+            content = region.get("content", "").strip()
+            parts = re.split(r'<table>|\n\n', content, maxsplit=1)
+            title = parts[0].strip() if parts else ""
+            if title:
+                titles.append(title)
+
+        if titles:
+            results[example["id"]] = ", ".join(titles)
 
     return results
+
 
 
 def load_results(result_path) -> dict:
