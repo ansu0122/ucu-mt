@@ -1,4 +1,5 @@
 import os
+import re
 import json
 from dotenv import load_dotenv
 import subprocess
@@ -36,7 +37,7 @@ def download_dataset():
     dataset = dataset.cast_column("image", Image())
     return dataset
 
-def extract_gt_content(dataset, style=None, region_types=None) -> list:
+def extract_content(dataset, style=None, region_types=None) -> list:
     """
     Extract ground-truth content from dataset based on optional style and region type filters.
 
@@ -75,9 +76,8 @@ def extract_gt_content(dataset, style=None, region_types=None) -> list:
         results[example["id"]] = joined_content
     return results
 
-import re
 
-def extract_gt_titles(dataset, style=None, region_types=None) -> dict:
+def extract_titles(dataset, style=None, region_types=None) -> dict:
     """
     Extract ground-truth titles from dataset based on optional style and region type filters.
 
