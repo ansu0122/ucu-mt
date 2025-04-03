@@ -3,16 +3,19 @@ from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 
 def _get_structured_prompt(query: str, parser: PydanticOutputParser) -> str:
+
+    template = """
+    {query} 
+    Поверни результат у форматі JSON згідно з цією схемою:
+    {schema}
+    """.strip()
+
     prompt_template = PromptTemplate(
-            template=(
-                f"{query}\n\n"\
-                f"Поверни результат у форматі JSON згідно з цією схемою:\n"\
-                "{schema}"
-            ),
-            input_variables=[],
-            partial_variables={"schema": parser.get_format_instructions()}
-        )
-    return prompt_template.format()
+        template=template,
+        input_variables=["query"],
+        partial_variables={"schema": parser.get_format_instructions()}
+    )
+    return prompt_template.format(query=query)
  
 def get_text_template(parser: PydanticOutputParser = None) -> str:
 
