@@ -1,3 +1,4 @@
+import re
 import torch
 from PIL import Image
 from typing import Optional, Union, List, Mapping, Any
@@ -8,42 +9,6 @@ from pydantic import BaseModel, Field, ValidationError
 from unsloth import FastVisionModel
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import PromptTemplate
-
-
-class AnswerSchema(BaseModel):
-    # text: str = Field(description="Заголовки і вміст текстових розділів документу")
-    # titles: list = Field(description="Список заголовків текстових розділів, таблиці та графіку")
-    table: str = Field(description="Таблиця з даними в форматі HTML")
-
-
-def parse_document_response(parser: PydanticOutputParser, output_text: str) -> Optional[AnswerSchema]:
-    try:
-        return parser.parse(output_text)
-    except Exception as e:
-        print(f"[Parsing Error] Could not parse:\n{output_text}\n\nError: {e}")
-        return None
-
-
-def build_doc_extraction_prompt(parser: PydanticOutputParser) -> str:
-    # prompt_template = PromptTemplate(
-    #     template=(
-    #         # "Витягни заголовки і текст розділів документу в порядку їх прочитання.\n"
-    #         "Витягни таблицю з даними в форматі HTML.\n\n"
-    #         "Поверни результат у форматі JSON згідно з цією схемою:\n"
-    #         "{\"table\":\"<table>...</table>\"}"
-    #     ),
-    #     input_variables=[],
-    #     partial_variables={"format_instructions": parser.get_format_instructions()}
-    # )
-    # return prompt_template.format()
-
-    return (
-        "Витягни таблицю з даними в форматі HTML.\n\n"
-        "Поверни результат у форматі JSON з такими полями:\n"
-        "{\n"
-        '  "table": "<table>...</table>"\n'
-        "}"
-    )
 
 
 class QwenVL2_LLM:
@@ -69,14 +34,17 @@ class QwenVL2_LLM:
         # self.model.to(device)
         FastVisionModel.for_inference(self.model)
 
-    def generate(self, prompt: str, image: Union[str, Image.Image]) -> str:
+    def set_prompt(self, prompt: str):
+        self.prompt = prompt
+
+    def generate(self, image: Union[str, Image.Image]) -> str:
         if isinstance(image, str):
             image = Image.open(image).convert("RGB")
 
         messages = [
             {"role": "user", "content": [
                 {"type": "image"},
-                {"type": "text", "text": prompt}
+                {"type": "text", "text": self.prompt}
             ]}
         ]
 
@@ -92,29 +60,32 @@ class QwenVL2_LLM:
         gen_args = dict(
             max_new_tokens=self.max_new_tokens,
             use_cache=True,
-            temperature=1.5,
+            temperature=1.0,
             min_p = 0.1
         )
 
         output = self.model.generate(**inputs, **gen_args)
         decoded = self.tokenizer.batch_decode(output, skip_special_tokens=True, clean_up_tokenization_spaces=True)
-
+        decoded = "".join(decoded)
         return decoded if decoded else ""
 
 
-def process_doc_image(image: Image, model: QwenVL2_LLM): #-> Optional[AnswerSchema]:
-    image = image.convert("RGB")
-    parser = PydanticOutputParser(pydantic_object=AnswerSchema)
-    prompt = build_doc_extraction_prompt(parser)
-    response = model.generate(prompt=prompt, image=image)
+    def process_doc_image(self, image: Image): #-> Optional[AnswerSchema]:
+        torch.cuda.empty_cache()
 
-    if isinstance(response, list):
-        response = response[0]
+        image = image.convert("RGB")
+        response = self.generate(image=image)
 
-    if "assistant\n" in response:
-        response = response.split("assistant\n", 1)[1].strip()
-        
-    # return parse_document_response(parser, response)
-    return response
+        if isinstance(response, list):
+            response = response[0]
 
-    
+        if "assistant\n" in response:
+            response = response.split("assistant\n", 1)[1].strip()
+        if "<table>" in response:
+            response = re.search(r"<table>.*?</table>", response, re.DOTALL)
+            response = response.group(0) if response else ""
+            
+        # return parse_document_response(parser, response)
+        return response
+
+
