@@ -65,6 +65,11 @@ def extract_content(dataset, style=None, region_types=None) -> list:
         if style is not None and example.get("style") not in style:
             continue
 
+        _, height = example.get('image', []).size
+
+        if height > 1200:
+            continue
+
         grounding = example.get("grounding", [])
         text_segments = [
             region["content"].strip()

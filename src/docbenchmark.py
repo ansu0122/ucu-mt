@@ -102,25 +102,25 @@ if __name__ == "__main__":
     eval_ocr(dataset, 'results/ocr_text.jsonl', region_types=['text'])
 
     print("OCR - Document - Tessarect")
-    eval_ocr(dataset, 'results/ocr_whole_doc.jsonl', region_types=['text'])
+    eval_ocr(dataset, 'results/ocr_whole_doc.jsonl', region_types=['text', 'table'])
 
     print("OCR - Text - Qwen2VL_4bit")
     eval_ocr(dataset, 'results/ocr_whole_doc_qwen2vl_4bit.jsonl', region_types=['text'])
 
     print("OCR - Document - Qwen2VL_4bit")
-    eval_ocr(dataset, 'results/ocr_whole_doc_qwen2vl_4bit.jsonl', region_types=['text', 'table', 'chart'])
+    eval_ocr(dataset, 'results/ocr_whole_doc_qwen2vl_4bit.jsonl', region_types=['text', 'table'])
 
-    print("Table Extraction - Document - Qwen2VL_4bit")
-    eval_table_extraction(dataset, 'results/table_whole_doc_qwen2vl_4bit.jsonl', region_types=['table'])
+    # print("Table Extraction - Document - Qwen2VL_4bit")
+    # eval_table_extraction(dataset, 'results/table_whole_doc_qwen2vl_4bit.jsonl', region_types=['table'])
 
-    print("Table Extraction - Document - Qwen2VL")
-    eval_table_extraction(dataset, 'results/table_whole_doc_qwen2vl.jsonl', region_types=['table'])
+    # print("Table Extraction - Document - Qwen2VL")
+    # eval_table_extraction(dataset, 'results/table_whole_doc_qwen2vl.jsonl', region_types=['table'])
 
-    print("Layout Analysis - Document - Qwen2VL_4bit")
-    eval_layout_analysis(dataset, 'results/layout_whole_doc_qwen2vl_4bit.jsonl', region_types=['text', 'table', 'chart'])
+    # print("Layout Analysis - Document - Qwen2VL_4bit")
+    # eval_layout_analysis(dataset, 'results/layout_whole_doc_qwen2vl_4bit.jsonl', region_types=['text', 'table', 'chart'])
 
-    print("Layout Analysis - Document - Qwen2VL")
-    eval_layout_analysis(dataset, 'results/layout_whole_doc_qwen2vl.jsonl', region_types=['text', 'table', 'chart'])
+    # print("Layout Analysis - Document - Qwen2VL")
+    # eval_layout_analysis(dataset, 'results/layout_whole_doc_qwen2vl.jsonl', region_types=['text', 'table', 'chart'])
     
-    print("Classification - Document - Qwen2VL_4bit")
-    eval_classification(dataset, 'results/class_whole_doc_qwen2vl_4bit.jsonl')
+    # print("Classification - Document - Qwen2VL_4bit")
+    # eval_classification(dataset, 'results/class_whole_doc_qwen2vl_4bit.jsonl')

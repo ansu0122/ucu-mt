@@ -1,5 +1,6 @@
 import re
 
+
 def stip_md_table(text: str) -> str:
     lines = text.splitlines()
     cleaned_lines = []
@@ -10,7 +11,12 @@ def stip_md_table(text: str) -> str:
             continue
         cleaned_lines.append(line)
 
-    return '\n'.join(cleaned_lines).strip()
+    return strip_chart_sequence('\n'.join(cleaned_lines).strip())
+
+
+def strip_chart_sequence(text: str) -> str:
+    # Remove the number-hyphen sequence
+    return re.sub(r'(?:\d+-){5,}\d+', '', text)
 
 
 def strip_html_table(text: str) -> str:
