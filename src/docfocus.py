@@ -55,6 +55,10 @@ def ocr_dataset(dataset, output_jsonl_path, ocr_fn, chunk_size=50, lang="ukr", r
         results = []
         for example in chunk:
             img = example["image"]
+            width, height = img.size
+            if height > 1200:
+                continue
+            
             grounding = example.get("grounding", [])
             if region_types:
                 text = ocr_cropped_regions(img, grounding, ocr_fn=ocr_fn, region_types=region_types, lang=lang)
