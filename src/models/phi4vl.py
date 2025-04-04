@@ -4,6 +4,11 @@ from PIL import Image
 from typing import Union
 from transformers import AutoModelForCausalLM, AutoProcessor, GenerationConfig
 
+from flash_attn.bert_padding import index_first_axis
+import transformers.models.phi.modeling_phi as phi_model
+if not hasattr(phi_model, "index_first_axis"):
+    setattr(phi_model, "index_first_axis", index_first_axis)
+
 class Phi4VisionLLM:
     def __init__(
         self,
@@ -11,7 +16,6 @@ class Phi4VisionLLM:
         max_new_tokens: int = 2048,
         device: str = "cuda",
         attn_mech: str = "flash_attention_2"
-
     ):
         self.max_new_tokens = max_new_tokens
         self.device = device
@@ -48,6 +52,8 @@ class Phi4VisionLLM:
             max_new_tokens=self.max_new_tokens,
             generation_config=self.generation_config,
             num_logits_to_keep=self.max_new_tokens,
+            eos_token_id=self.processor.tokenizer.eos_token_id,
+            pad_token_id=self.processor.tokenizer.pad_token_id,
         )
 
         # Remove the prompt part from the output
