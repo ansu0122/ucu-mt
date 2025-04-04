@@ -9,7 +9,9 @@ class Phi4VisionLLM:
         self,
         model_name: str = "microsoft/Phi-4-multimodal-instruct",
         max_new_tokens: int = 2048,
-        device: str = "cuda"
+        device: str = "cuda",
+        attn_mech: str = "flash_attention_2"
+
     ):
         self.max_new_tokens = max_new_tokens
         self.device = device
@@ -23,7 +25,7 @@ class Phi4VisionLLM:
             device_map=device,
             torch_dtype="auto",
             trust_remote_code=True,
-            _attn_implementation='eager',
+            _attn_implementation=attn_mech,
         ).to(device)
 
         self.generation_config = GenerationConfig.from_pretrained(model_name)
@@ -44,7 +46,8 @@ class Phi4VisionLLM:
         generate_ids = self.model.generate(
             **inputs,
             max_new_tokens=self.max_new_tokens,
-            generation_config=self.generation_config
+            generation_config=self.generation_config,
+            num_logits_to_keep=self.max_new_tokens,
         )
 
         # Remove the prompt part from the output

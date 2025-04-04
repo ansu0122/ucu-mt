@@ -31,3 +31,5 @@ dependencies:
     - beautifulsoup4
     - scikit-learn
     - zss
+    - scipy
+    - backoff
