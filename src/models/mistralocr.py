@@ -40,7 +40,7 @@ class MistralOCRModel:
         self.prompt = prompt
 
     def generate(self, image: Union[str, Path, Image.Image]) -> BaseModel:
-        assert self.schema is not None, "Output schema not set. Use set_output_schema(schema) before generate."
+        # assert self.schema is not None, "Output schema not set. Use set_output_schema(schema) before generate."
         if isinstance(image, Image.Image):
             from tempfile import NamedTemporaryFile
             with NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
@@ -55,6 +55,7 @@ class MistralOCRModel:
         base64_data_url = f"data:image/jpeg;base64,{encoded_image}"
 
         # Step 1: OCR
+        time.sleep(2.0)
         image_response = self.client.ocr.process(
             document=ImageURLChunk(image_url=base64_data_url),
             model=self.ocr_model
@@ -63,9 +64,9 @@ class MistralOCRModel:
         
         if self.prompt is None:
             return ocr_markdown
-        time.sleep(3.0)
 
         # Step 2: Structured parsing via chat
+        time.sleep(2.0)
         chat_response = self.client.chat.parse(
             model=self.chat_model,
             messages=[
@@ -91,7 +92,7 @@ class MistralOCRModel:
     def process_doc_image(self, image: Union[str, Path, Image.Image]) -> BaseModel:
         try:
             result = self.generate(image=image)
-            return "".join(list(result.model_dump().values()))
+            return "".join(result if isinstance(result, str) else list(result.model_dump().values()))
         except Exception as e:
             print(f"Error processing image: {e}")
             return None
@@ -114,7 +115,7 @@ if __name__ == "__main__":
     """
 
     ocr_model = MistralOCRModel()
-    ocr_model.set_prompt(query)
-    ocr_model.set_output_schema(TextSchema)
+    # ocr_model.set_prompt(query)
+    # ocr_model.set_output_schema(TextSchema)
     result = ocr_model.process_doc_image("dataset/images/46f856e3f0ff4afabbf15754eea3340f.jpg")
     print(result)
