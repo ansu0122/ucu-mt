@@ -34,9 +34,13 @@ def ocr_cropped_regions(image, grounding, ocr_fn, region_types=None, lang="ukr")
         cropped = image.crop((left, top, right, bottom))
         try:
             text = ocr_fn(cropped)
+            if text is None:
+                return None
+            
             ocr_texts.append(text.strip())
         except Exception as e:
             print(f"OCR error on region: {e}")
+            return None
 
     return "\n\n".join(ocr_texts).strip()
 
@@ -64,6 +68,9 @@ def ocr_dataset(dataset, output_jsonl_path, ocr_fn, chunk_size=50, lang="ukr", r
                 text = ocr_cropped_regions(img, grounding, ocr_fn=ocr_fn, region_types=region_types, lang=lang)
             else:
                 text = ocr_fn(img)
+
+            if text is None:
+                continue
 
             results.append({
                 "id": example["id"],

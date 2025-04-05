@@ -25,6 +25,7 @@ class MistralOCRModel:
         self.temperature = temperature
         self.schema: Type[BaseModel] = None
         self.client = Mistral(api_key=MISTRAL_API_KEY)
+        self.prompt = None
 
     def set_output_schema(self, schema_model: Type[BaseModel]):
         """
@@ -59,7 +60,10 @@ class MistralOCRModel:
             model=self.ocr_model
         )
         ocr_markdown = image_response.pages[0].markdown
-        time.sleep(2.0)
+        
+        if self.prompt is None:
+            return ocr_markdown
+        time.sleep(3.0)
 
         # Step 2: Structured parsing via chat
         chat_response = self.client.chat.parse(
@@ -85,32 +89,32 @@ class MistralOCRModel:
         return chat_response.choices[0].message.parsed
 
     def process_doc_image(self, image: Union[str, Path, Image.Image]) -> BaseModel:
-        return self.generate(image=image)
+        try:
+            result = self.generate(image=image)
+            return "".join(list(result.model_dump().values()))
+        except Exception as e:
+            print(f"Error processing image: {e}")
+            return None
 
 
 if __name__ == "__main__":
     from pydantic import BaseModel, Field
     from typing import List, Dict
 
-    class TitleSchema(BaseModel):
-        titles: list[str] = Field(description="Назви для усіх розділів документу, таблиці і графіку в порядку прочитання.")
+    class TextSchema(BaseModel):
+        text: str = Field(description="Tекст документу.")
 
     query = """
-        Витягни назви всіх розділів документа, таблиць і графіків у порядку, в якому вони з’являються в документі.
+        Витягни текст зображення у точному вигляді.
+        – Залиши слова, літери й розділові знаки такими, як вони є.
+        – Збережи порядок, великі й малі літери, пробіли, розриви рядків.
+        – Будь-яке редагування, переклад, дописування або зміна заборонені.
 
-        Вимоги:
-        – Витягни лише ті елементи, які виглядають як заголовки, підписи або назви секцій документу.
-        – Залиш назви у тому вигляді, в якому вони подані у документі.
-        – Збережи точний порядок прочитання — зверху вниз, зліва направо.
-        – Уникай інтерпретацій, описів чи узагальнень.
-        – Поверни тільки список назв без додаткового тексту.
-
-        Важливо:
-        Текст кожної назви має залишатися без змін. Будь-які правки або перекручення заборонено.
+        Поверни лише текст — дослівно.
     """
 
     ocr_model = MistralOCRModel()
     ocr_model.set_prompt(query)
-    ocr_model.set_output_schema(TitleSchema)
-    result = ocr_model.process_doc_image("dataset/images/0a2dbad583cd485f885994f5294d2ae8.jpg")
+    ocr_model.set_output_schema(TextSchema)
+    result = ocr_model.process_doc_image("dataset/images/46f856e3f0ff4afabbf15754eea3340f.jpg")
     print(result)
