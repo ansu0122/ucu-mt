@@ -103,10 +103,10 @@ class TableSchema(BaseModel):
     table: str = Field(description="Таблиця з даними в форматі HTML.")
 
 class TitleSchema(BaseModel):
-    titles: list = Field(description="Назви для усіх розділів документу, таблиці і графіку в порядку прочитання.")
+    titles: list[str] = Field(description="Назви для усіх розділів документу, таблиці і графіку в порядку прочитання.")
 
 class ClassSchema(BaseModel):
-    classes: list = Field(description="Назва класу для тексту зображення.")
+    classes: list[str] = Field(description="Назва класу для тексту зображення.")
 
 
 if __name__ == "__main__":
