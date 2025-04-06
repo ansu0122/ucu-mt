@@ -33,3 +33,4 @@ dependencies:
     - zss
     - scipy
     - backoff
+    - trl

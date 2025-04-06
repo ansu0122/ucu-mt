@@ -4,7 +4,7 @@ import docdataset as dd
 import docmeasure as dm
 
 
-def eval_ocr(dataset, prediction_path, region_types=['text', 'table']):
+def eval_ocr(dataset, prediction_path, region_types=None):
     # Load and clean predictions
     prediction = dd.load_results(prediction_path)
     prediction = {key: su.stip_md_table(item) for key, item in prediction.items()}
@@ -51,7 +51,7 @@ def eval_table_extraction(dataset, prediction_path, region_types=['table']):
         print(f"Mean TEDS ({style}): {mean_teds_style * 100:.4f}%")
 
 
-def eval_layout_analysis(dataset, prediction_path, region_types=['text', 'table', 'chart']):
+def eval_layout_analysis(dataset, prediction_path, region_types=None):
     # Load predictions
     prediction = dd.load_results(prediction_path)
 
@@ -94,13 +94,13 @@ def eval_classification(dataset, prediction_path):
             acc_style = dm.accuracy(ground_truth_style, prediction)
             print(f"Accuracy ({style}): {acc_style * 100:.4f}%")
 
-def ocr_bench():
+def ocr_bench(dataset):
     # Tesseract
     print("OCR - Text - Tesseract")
     eval_ocr(dataset, 'results/ocr_text.jsonl', region_types=['text'])
 
     print("OCR - Document - Tesseract")
-    eval_ocr(dataset, 'results/ocr_whole_doc.jsonl')
+    eval_ocr(dataset, 'results/ocr_whole_doc.jsonl', region_types=None)
 
     # Qwen2VL-4bit
     print("OCR - Text - Qwen2VL_4bit")
@@ -110,43 +110,48 @@ def ocr_bench():
     eval_ocr(dataset, 'results/ocr_text_qwen2vl_4bit_v2.jsonl', region_types=['text'])
 
     print("OCR - Document - Qwen2VL_4bit")
-    eval_ocr(dataset, 'results/ocr_whole_doc_qwen2vl_4bit.jsonl')
+    eval_ocr(dataset, 'results/ocr_whole_doc_qwen2vl_4bit.jsonl', region_types=None)
 
     print("OCR - Document V2 - Qwen2VL_4bit")
-    eval_ocr(dataset, 'results/ocr_whole_doc_qwen2vl_4bit_v2.jsonl')
+    eval_ocr(dataset, 'results/ocr_whole_doc_qwen2vl_4bit_v2.jsonl', region_types=None)
 
     # Qwen2VL
     print("OCR - Text V2 - Qwen2VL")
     eval_ocr(dataset, 'results/ocr_text_qwen2vl.jsonl', region_types=['text'])
 
     print("OCR - Document V2 - Qwen2VL")
-    eval_ocr(dataset, 'results/ocr_whole_doc_qwen2vl.jsonl')
+    eval_ocr(dataset, 'results/ocr_whole_doc_qwen2vl.jsonl', region_types=None)
 
     # Qwen2.5VL
     print("OCR - Text V2 - Qwen2.5VL")
     eval_ocr(dataset, 'results/ocr_text_qwen25vl.jsonl', region_types=['text'])
 
     print("OCR - Document V2 - Qwen2.5VL")
-    eval_ocr(dataset, 'results/ocr_whole_doc_qwen25vl.jsonl')
+    eval_ocr(dataset, 'results/ocr_whole_doc_qwen25vl.jsonl', region_types=None)
 
     # Phi4VL
     print("OCR - Text V2 - Phi4VL")
     eval_ocr(dataset, 'results/ocr_text_phi4vl.jsonl', region_types=['text'])
 
     print("OCR - Document V2 - Phi4VL")
-    eval_ocr(dataset, 'results/ocr_whole_doc_phi4vl.jsonl')
+    eval_ocr(dataset, 'results/ocr_whole_doc_phi4vl.jsonl', region_types=None)
 
     # MistralOCR
     print("OCR - Text V2 - MistralOCR")
     eval_ocr(dataset, 'results/ocr_text_mistralocr.jsonl', region_types=['text'])
 
     print("OCR - Document V2 - MistralOCR")
-    eval_ocr(dataset, 'results/ocr_whole_doc_mistralocr.jsonl')
+    eval_ocr(dataset, 'results/ocr_whole_doc_mistralocr.jsonl', region_types=None)
 
     # Gemeni2.0 Flash
+    print("OCR - Text V2 - Gemini2.0 Flash")
+    eval_ocr(dataset, 'results/ocr_text_gemini.jsonl', region_types=['text'])
+
+    print("OCR - Document V2 - Gemini2.0 Flas")
+    eval_ocr(dataset, 'results/ocr_whole_doc_gemini.jsonl', region_types=None)
 
 
-def tabext_bench():
+def tabext_bench(dataset):
     # Qwen2VL-4bit
     print("Table Extraction - Table - Qwen2VL_4bit")
     eval_table_extraction(dataset, 'results/table_table_qwen2vl_4bit.jsonl', region_types=['table'])
@@ -183,9 +188,14 @@ def tabext_bench():
     eval_table_extraction(dataset, 'results/table_whole_doc_mistralocr.jsonl')
 
     # Gemeni2.0 Flash
+    print("Table Extraction - Table - Gemini2.0 Flash")
+    eval_table_extraction(dataset, 'results/table_table_geminin.jsonl', region_types=['table'])
+
+    print("Table Extraction - Document - Gemini2.0 Flash")
+    eval_table_extraction(dataset, 'results/table_whole_doc_gemini.jsonl')
 
 
-def layout_bench():
+def layout_bench(dataset):
     # Qwen2VL-4bit
     print("Layout Analysis - Document - Qwen2VL_4bit")
     eval_layout_analysis(dataset, 'results/layout_whole_doc_qwen2vl_4bit.jsonl')
@@ -207,9 +217,11 @@ def layout_bench():
     eval_layout_analysis(dataset, 'results/layout_whole_doc_mistralocr.jsonl')
 
     # Gemeni2.0 Flash
+    print("Layout Analysis - Document - Gemini2.0 Flash")
+    eval_layout_analysis(dataset, 'results/layout_whole_doc_gemini.jsonl')
 
 
-def class_bench():
+def class_bench(dataset):
     # Qwen2VL-4bit
     print("Classification - Document - Qwen2VL_4bit")
     eval_classification(dataset, 'results/class_whole_doc_qwen2vl_4bit.jsonl')
@@ -227,15 +239,18 @@ def class_bench():
     eval_classification(dataset, 'results/class_whole_doc_phi4vl.jsonl')
 
     # MistralOCR
-    print("Classification - Document - MIstralOCR")
+    print("Classification - Document - MistralOCR")
     eval_classification(dataset, 'results/class_whole_doc_mistralocr.jsonl')
 
     # Gemeni2.0 Flash
+    print("Classification - Document - Gemini2.0 Flash")
+    eval_classification(dataset, 'results/class_whole_doc_gemini.jsonl')
 
 
 if __name__ == "__main__":
     dataset = dd.download_dataset()['train']
 
+    ocr_bench(dataset)
     
 
     

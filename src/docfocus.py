@@ -4,7 +4,7 @@ import docdataset as dd
 
 
 def default_ocr_fn(ocr_fn):
-    def wrapper(image, lang="ukr"):
+    def wrapper(image):
         try:
             return ocr_fn(image)
         except Exception as e:
@@ -13,7 +13,7 @@ def default_ocr_fn(ocr_fn):
     return wrapper
 
 
-def ocr_cropped_regions(image, grounding, ocr_fn, region_types=None, lang="ukr"):
+def ocr_cropped_regions(image, grounding, ocr_fn, region_types=None):
     valid_types = {"text", "table", "chart"}
     if region_types is None or not all(rt in valid_types for rt in region_types):
         raise ValueError("region_types must be a list containing one or more of: 'text', 'table', 'chart'")
@@ -45,7 +45,7 @@ def ocr_cropped_regions(image, grounding, ocr_fn, region_types=None, lang="ukr")
     return "\n\n".join(ocr_texts).strip()
 
 
-def ocr_dataset(dataset, output_jsonl_path, ocr_fn, chunk_size=50, lang="ukr", region_types=None):
+def ocr_dataset(dataset, output_jsonl_path, ocr_fn, chunk_size=50, region_types=None):
     os.makedirs(os.path.dirname(output_jsonl_path), exist_ok=True)
 
     with open(output_jsonl_path, "w", encoding="utf-8") as f:
@@ -88,10 +88,10 @@ if __name__ == "__main__":
     dataset = dd.download_dataset()['train']
 
     def pytesseract_ocr(image):
-        return pytesseract.image_to_string(image, lang="ukr").strip()
+        return pytesseract.image_to_string(image).strip()
 
     # OCR cropped regions
-    # ocr_dataset(dataset, "results/ocr_text.jsonl", ocr_fn=pytesseract_ocr, chunk_size=50, lang="ukr", region_types=["text"])
+    # ocr_dataset(dataset, "results/ocr_text.jsonl", ocr_fn=pytesseract_ocr, chunk_size=50, region_types=["text"])
 
     # OCR whole image
-    ocr_dataset(dataset, "results/ocr_whole_doc.jsonl", ocr_fn=pytesseract_ocr, chunk_size=50, lang="ukr")
+    ocr_dataset(dataset, "results/ocr_whole_doc.jsonl", ocr_fn=pytesseract_ocr, chunk_size=50)
