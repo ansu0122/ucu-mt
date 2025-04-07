@@ -6,6 +6,10 @@ sudo apt install git-lfs
 git lfs install
 sudo apt install -y libgl1 libglib2.0-0 ffmpeg
 
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+source ~/miniconda3/etc/profile.d/conda.sh
+
 ENV_NAME=$(grep "name:" conda.yaml | awk '{print $2}')
 
 source ~/miniconda3/bin/activate

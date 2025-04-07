@@ -34,3 +34,4 @@ dependencies:
     - scipy
     - backoff
     - trl
+    - flash_attn

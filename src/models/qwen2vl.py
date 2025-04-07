@@ -27,7 +27,9 @@ class QwenVL2_LLM:
             model_name,
             load_in_4bit=load_in_4bit,
             use_gradient_checkpointing=use_gradient_checkpointing,
+            attn_implementation="eager"
         )
+        self.model = self.model.to(dtype=torch.bfloat16)
 
         self.tokenizer.use_fast = True
 
