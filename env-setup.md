@@ -34,3 +34,8 @@ git config --global user.email "andriy.suh@gmail.com"
 git config --global user.name "Andriy Sukh"
 
 du -sh /root/.cache/huggingface/hub/*
+
+
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+source ~/miniconda3/etc/profile.d/conda.sh
