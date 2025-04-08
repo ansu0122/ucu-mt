@@ -26,9 +26,8 @@ class AyaVisionLLM:
     def set_prompt(self, prompt: str):
         self.prompt = prompt
 
-    def generate(self, image: Union[str, Image.Image], prompt: str = None) -> str:
-        if prompt is not None:
-            self.set_prompt(prompt)
+    def generate(self, image: Union[str, Image.Image]) -> str:
+
         if not self.prompt:
             raise ValueError("Prompt is not set. Use `set_prompt()` or pass `prompt` to `generate()`.")
 
@@ -59,18 +58,20 @@ class AyaVisionLLM:
         outputs = self.model.generate(
             **inputs,
             max_new_tokens=self.max_new_tokens,
-            do_sample=True,
-            temperature=0.3,
+            do_sample=False,  # <<< Greedy decoding
+            temperature=0.0,
+            eos_token_id=self.processor.tokenizer.eos_token_id,
+            pad_token_id=self.processor.tokenizer.pad_token_id,
         )
 
         decoded = self.processor.tokenizer.decode(
             outputs[0][inputs["input_ids"].shape[1]:],
             skip_special_tokens=True,
             clean_up_tokenization_spaces=True
-        )
-        decoded = "".join(decoded)
+        ).strip()
 
-        return decoded if decoded else ""
+        return decoded
+
 
     def process_doc_image(self, image: Union[str, Image.Image]) -> str:
         torch.cuda.empty_cache()
