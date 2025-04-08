@@ -53,7 +53,7 @@ def load_results(result_path) -> dict:
     return ocr_map
 
 
-def validate_filters(style, region_types=None):
+def _validate_filters(style, region_types=None):
     if style is not None:
         if not isinstance(style, list) or not all(s in VALID_STYLES for s in style):
             raise ValueError("style must be a list containing one or more of: 'print', 'hand', 'scan'")
@@ -88,7 +88,7 @@ def extract_content(
     max_height: int = 1200
 ) -> Dict[str, str]:
 
-    validate_filters(style, region_types)
+    _validate_filters(style, region_types)
     results = {}
 
     for entry in dataset:
@@ -97,11 +97,11 @@ def extract_content(
         
         image = entry.get("image")
         if image is None:
-            return None
+            continue
 
         _, height = image.size
         if height > max_height:
-            return None
+            continue
 
         result = _extract_content(entry, region_types=region_types)
         if result is None:
@@ -142,7 +142,7 @@ def extract_titles(
     style: Optional[List[str]] = None,
     region_types: Optional[List[str]] = None
 ) -> Dict[str, str]:
-    validate_filters(style, region_types)
+    _validate_filters(style, region_types)
     results = {}
 
     for entry in dataset:

@@ -95,7 +95,7 @@ def eval_classification(dataset, prediction_path):
             print(f"Accuracy ({style}): {acc_style * 100:.4f}%")
 
 def ocr_bench(dataset):
-    # Tesseract
+    #Tesseract
     print("OCR - Text - Tesseract")
     eval_ocr(dataset, 'results/ocr_text.jsonl', region_types=['text'])
 
@@ -104,50 +104,58 @@ def ocr_bench(dataset):
 
     # Qwen2VL-4bit
     print("OCR - Text - Qwen2VL_4bit")
-    eval_ocr(dataset, 'results/ocr_text_qwen2vl_4bit.jsonl', region_types=['text'])
-
-    print("OCR - Text V2 - Qwen2VL_4bit")
     eval_ocr(dataset, 'results/ocr_text_qwen2vl_4bit_v2.jsonl', region_types=['text'])
 
     print("OCR - Document - Qwen2VL_4bit")
-    eval_ocr(dataset, 'results/ocr_whole_doc_qwen2vl_4bit.jsonl', region_types=None)
-
-    print("OCR - Document V2 - Qwen2VL_4bit")
     eval_ocr(dataset, 'results/ocr_whole_doc_qwen2vl_4bit_v2.jsonl', region_types=None)
 
     # Qwen2VL
-    print("OCR - Text V2 - Qwen2VL")
+    print("OCR - Text - Qwen2VL")
     eval_ocr(dataset, 'results/ocr_text_qwen2vl.jsonl', region_types=['text'])
 
-    print("OCR - Document V2 - Qwen2VL")
+    print("OCR - Document - Qwen2VL")
     eval_ocr(dataset, 'results/ocr_whole_doc_qwen2vl.jsonl', region_types=None)
 
     # Qwen2.5VL
-    print("OCR - Text V2 - Qwen2.5VL")
+    print("OCR - Text - Qwen2.5VL")
     eval_ocr(dataset, 'results/ocr_text_qwen25vl.jsonl', region_types=['text'])
 
-    print("OCR - Document V2 - Qwen2.5VL")
+    print("OCR - Document - Qwen2.5VL")
     eval_ocr(dataset, 'results/ocr_whole_doc_qwen25vl.jsonl', region_types=None)
 
+    # Qwen2.5VL_Ada
+    print("OCR - Text - Qwen2.5VL_Ada")
+    eval_ocr(dataset, 'results/ocr_text_qwen25vl_ada.jsonl', region_types=['text'])
+
+    print("OCR - Document - Qwen2.5VL_Ada")
+    eval_ocr(dataset, 'results/ocr_whole_doc_qwen25vl_ada.jsonl', region_types=None)
+
     # Phi4VL
-    print("OCR - Text V2 - Phi4VL")
+    print("OCR - Text - Phi4VL")
     eval_ocr(dataset, 'results/ocr_text_phi4vl.jsonl', region_types=['text'])
 
-    print("OCR - Document V2 - Phi4VL")
+    print("OCR - Document - Phi4VL")
     eval_ocr(dataset, 'results/ocr_whole_doc_phi4vl.jsonl', region_types=None)
 
+    # Aya8VL
+    print("OCR - Text - Aya8VL")
+    eval_ocr(dataset, 'results/ocr_text_aya8vl.jsonl', region_types=['text'])
+
+    print("OCR - Document - Aya8VL")
+    eval_ocr(dataset, 'results/ocr_whole_doc_aya8vl.jsonl', region_types=None)
+
     # MistralOCR
-    print("OCR - Text V2 - MistralOCR")
+    print("OCR - Text - MistralOCR")
     eval_ocr(dataset, 'results/ocr_text_mistralocr.jsonl', region_types=['text'])
 
-    print("OCR - Document V2 - MistralOCR")
+    print("OCR - Document - MistralOCR")
     eval_ocr(dataset, 'results/ocr_whole_doc_mistralocr.jsonl', region_types=None)
 
     # Gemeni2.0 Flash
-    print("OCR - Text V2 - Gemini2.0 Flash")
+    print("OCR - Text - Gemini2.0 Flash")
     eval_ocr(dataset, 'results/ocr_text_gemini.jsonl', region_types=['text'])
 
-    print("OCR - Document V2 - Gemini2.0 Flas")
+    print("OCR - Document - Gemini2.0 Flas")
     eval_ocr(dataset, 'results/ocr_whole_doc_gemini.jsonl', region_types=None)
 
 
