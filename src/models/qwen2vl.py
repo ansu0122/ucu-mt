@@ -62,8 +62,8 @@ class QwenVL2_LLM:
         gen_args = dict(
             max_new_tokens=self.max_new_tokens,
             use_cache=True,
-            temperature=1.0,
-            min_p = 0.1
+            # temperature=1.0,
+            # min_p = 0.1
         )
 
         output = self.model.generate(**inputs, **gen_args)
