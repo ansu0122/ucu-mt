@@ -5,6 +5,9 @@ from bs4 import BeautifulSoup
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from zss import Node, simple_distance
+from sentence_transformers import SentenceTransformer
+
+vectorizer = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 def calculate_cer(gt_text, ocr_text):
@@ -150,35 +153,6 @@ def mean_teds(ground_truth: dict, predictions: dict, verbose: bool = False) -> f
     return total_teds / len(matches) if matches else 0.0
 
 
-def ordered_sequence_similarity(predicted_titles, ground_truth_titles):
-    """
-    Compute cosine similarity between predicted and ground truth title sequences 
-    while preserving order using n-grams in TF-IDF.
-    """
-    vectorizer = TfidfVectorizer(
-                analyzer='word', 
-                ngram_range=(3, 6), 
-                lowercase=True,              # Optional: or False, if case matters
-                token_pattern=r"(?u)\b\w+\b" # Make sure short words aren't dropped
-            )
-    # vectorizer = TfidfVectorizer(analyzer='char_wb', ngram_range=(3, 6))
-
-    predicted_sequence = " -> ".join(predicted_titles).strip()
-    ground_truth_sequence = " -> ".join(ground_truth_titles).strip()
-
-    # If both sequences are empty after joining
-    if not predicted_sequence and not ground_truth_sequence:
-        return 1.0  # Perfect match (nothing predicted, nothing expected)
-    elif not predicted_sequence or not ground_truth_sequence:
-        return 0.0  # One is empty, the other is not
-
-    tfidf_matrix = vectorizer.fit_transform([predicted_sequence, ground_truth_sequence])
-
-    similarity_score = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])[0][0]
-    
-    return similarity_score
-
-
 def mean_oss(ground_truth: dict, predictions: dict, verbose: bool = False) -> float:
     matches = _match_gt_results(ground_truth, predictions)
 
@@ -194,6 +168,50 @@ def mean_oss(ground_truth: dict, predictions: dict, verbose: bool = False) -> fl
     return total_oss / len(matches) if matches else 0.0
 
 
+def ordered_sequence_similarity(
+    ground_truth: list, 
+    predictions: list, 
+    threshold: float = 0.75, 
+    max_roll: int = 5,
+    verbose: bool = False
+) -> float:
+    if not predictions and not ground_truth:
+        return 1.0
+    elif not predictions or not ground_truth:
+        return 0.0
+
+    pred_vec = vectorizer.encode(predictions)
+    gt_vec = vectorizer.encode(ground_truth)
+
+    total_score = 0.0
+    matches = 0
+
+    for i in range(len(gt_vec)):
+        gt_title_vec = gt_vec[i].reshape(1, -1)
+        score = 0.0
+
+        for offset in range(max_roll + 1):
+            pred_index = i + offset
+            if pred_index >= len(pred_vec):
+                break
+
+            pred_title_vec = pred_vec[pred_index].reshape(1, -1)
+            sim = cosine_similarity(gt_title_vec, pred_title_vec)[0][0]
+
+            if sim >= threshold or offset == 0:
+                # Apply soft penalty for distance from ideal position
+                decay = 1.0 / (1 + offset)
+                score = sim * decay
+                if verbose:
+                    print(f"GT[{i}] matched to Pred[{pred_index}] with sim={sim:.2f}, decay={decay:.2f}")
+                break  # take the first match above threshold (or fallback to offset=0 match)
+
+        total_score += score
+        matches += 1
+
+    return total_score / matches if matches > 0 else 0.0
+
+
 def accuracy(ground_truth: dict, predictions: dict) -> float:
     matches = _match_gt_results(ground_truth, predictions)
     correct = sum(1 for match in matches if match['ground_truth'] == match['prediction'])
@@ -202,24 +220,24 @@ def accuracy(ground_truth: dict, predictions: dict) -> float:
 
 if __name__ == "__main__":
 
-    predicted_titles = ["Introduction", "Methodology", "Results and Discussion", "Conclusion"]
+    predicted_titles = ["Introduction", "Conclusion", "Results and Discussion", "Methodology"]
     ground_truth_titles = ["Introduction", "Methodology", "Results and Discussion", "Conclusion"]
 
-    sequence_similarity = ordered_sequence_similarity(predicted_titles, ground_truth_titles)
+    similarity = ordered_sequence_similarity(predicted_titles, ground_truth_titles)
 
-    print("Cosine Similarity (Sequence-Level):", sequence_similarity)
+    print("Cosine Similarity (Sequence-Level):", similarity)
 
 
     html1 = "<table><tbody><tr><td>Республіка</td><td>Назва фронту</td><td>Дата заснування</td><td>Тип</td></tr><tr><td>РРФСР</td><td>Демократична Росія</td><td>1990</td><td>Національний рух</td></tr><tr><td>УРСР</td><td>Народний Рух України</td><td>1988</td><td>Національний рух</td></tr><tr><td>БРСР</td><td>Відродження</td><td>1989</td><td>Національний рух</td></tr><tr><td>Узбецька РСР</td><td>Єдність</td><td>1988</td><td>Національний рух</td></tr><tr><td>КазРСР</td><td>Народний рух Казахстану</td><td>1989</td><td>Національний рух</td></tr><tr><td>ГРСР</td><td>Комітет національної свободи</td><td>1989</td><td>Національний рух</td></tr><tr><td>АзРСР</td><td>Народний фронт Азербайджану</td><td>1988</td><td>Національний рух</td></tr></tbody></table>"
-    html2 = "<table>\n  <thead>\n    <tr>\n      <th>Республіка</th>\n      <th>Назва фронту</th>\n      <th>Дата заснування</th>\n      <th>Тип</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>РРФСР</td>\n      <td>Демократична Росія</td>\n      <td>1990</td>\n      <td>Національний рух</td>\n    </tr>\n    <tr>\n      <td>УРСР</td>\n      <td>Народний Рух України</td>\n      <td>1988</td>\n      <td>Національний рух</td>\n    </tr>\n    <tr>\n      <td>БРСР</td>\n      <td>Відродження</td>\n      <td>1989</td>\n      <td>Національний рух</td>\n    </tr>\n    <tr>\n      <td>Узбецька РСР</td>\n      <td>Єдність</td>\n      <td>1988</td>\n      <td>Національний рух</td>\n    </tr>\n    <tr>\n      <td>КазРСР</td>\n      <td>Народний рух Казахстану</td>\n      <td>1989</td>\n      <td>Національний рух</td>\n    </tr>\n    <tr>\n      <td>ГРСР</td>\n      <td>Комітет національної свободи</td>\n      <td>1989</td>\n      <td>Національний рух</td>\n    </tr>\n    <tr>\n      <td>АзРСР</td>\n      <td>Народний фронт Азербайджану</td>\n      <td>1988</td>\n      <td>Національний рух</td>\n    </tr>\n  </tbody>\n</table>"
+    html2 = "<table>\n  <thead>\n    <tr>\n      <th>Республіканська партія</th>\n      <th>Назва фронту</th>\n      <th>Дата заснування</th>\n      <th>Тип</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>РРФСР</td>\n      <td>Демократична Росія</td>\n      <td>1990</td>\n      <td>Національний рух</td>\n    </tr>\n    <tr>\n      <td>УРСР</td>\n      <td>Народний Рух України</td>\n      <td>1988</td>\n      <td>Національний рух</td>\n    </tr>\n    <tr>\n      <td>БРСР</td>\n      <td>Відродження</td>\n      <td>1989</td>\n      <td>Національний рух</td>\n    </tr>\n    <tr>\n      <td>Узбецька РСР</td>\n      <td>Єдність</td>\n      <td>1988</td>\n      <td>Національний рух</td>\n    </tr>\n    <tr>\n      <td>КазРСР</td>\n      <td>Народний рух Казахстану</td>\n      <td>1989</td>\n      <td>Національний рух</td>\n    </tr>\n    <tr>\n      <td>ГРСР</td>\n      <td>Комітет національної свободи</td>\n      <td>1989</td>\n      <td>Національний рух</td>\n    </tr>\n    <tr>\n      <td>АзРСР</td>\n      <td>Народний фронт Азербайджану</td>\n      <td>1988</td>\n      <td>Національний рух</td>\n    </tr>\n  </tbody>\n</table>"
 
     teds = teds(html1, html2)
 
     print('real TEDS: ', teds)
 
-    tex1 = 'КООПЕРАТИВНИЙ БАНК Кооперати́вний банк — кредитно-фінансова установа, створювана товаровиробниками за галузевим чи територіальним принципом для задоволення взаємних потреб у кредитах чи інших банківських послугах. Кооперативним банкам властиві такі ознаки: колективний характер приватної власності; прибуток не ділять між пайовиками або вкладниками, а використовують на сплату процентів за вкладами та на збільшення резервного фонду; контроль за діяльністю банку не може здійснювати окрема особа, а тільки група осіб.\n\nОгляд кооперативних банків\n\nКооперативні банки – це кредитно-фінансові установи, які створюються товаровиробниками на основі колективного характеру приватної власності. Прибутки в них не розподіляються між вкладниками, а використовуються для сплати процентів за вкладами та збільшення резервного фонду. Діяльність кооперативних банків контролюється групою осіб. Історія розвитку таких банків розпочинається з кінця 18 століття, коли були засновані перші кооперативні фінансові установи в Європі.\n\nТаблиця: Основні фінансові показники кооперативних банків у Європі \n\nІсторія кооперативних банків\n\nІсторія кооперативних банків починається з Генрі Дункана у Шотландії у 1798 році. Значний внесок у розвиток кооперативних банків також зробили Герман Шульц в Німеччині та Фрідріх Вільгельм Райффайзен. Вони засновували банки, де вкладники та позичальники були частиною тієї ж спільноти, що формувало рівні можливості у розподілі прав та відповідальностей.\n\nКооперативні банки в світі\n\nКооперативні банки поширені в різних країнах світу, зокрема в Канаді та Європі. В Канаді такі установи трансформувались в кредитні каси. Найбільшими кооперативними банками в Європі є Креді Агріколь Банк, Le Crédit Mutuel, Rabobank та інші. У 2020 році кооперативні банки в Європі мали значну частку депозитів у своїх країнах.'
-    tex2 = 'КООПЕРАТИВНИЙ БАНК Кооперативний банк - кредитно-фінансова установа, створювана товарищами за галузевим чи територіальним принципом для задоволення вузьких потреб у кредитах чи інших банківських послугах. Кооперативним банкам властиві такі ознаки: колективний характер приватної власності, прибуток не діляться між пайовиками або вкладниками, а використовуються на сплату процентів за вкладами та на збільшення резервного фонду, контроль за діяльністю банку не може здійснювати окрема особа, а тільки група осіб.\n\nОгляд кооперативних банків\n\nКооперативні банки - це кредитно-фінансові установи, які створюються товарищами на основі колективного характеру приватної власності. Прибутки в них не розподіляються між вкладниками, а використовуються для сплати процентів за вкладами та збільшення резервного фонду. Діяльність кооперативних банків контролюється групою осіб. Історія розвитку таких банків розпочинається з кінця 18 століття, коли були засновані перші кооперативні фінансові установи в Європі.\n\nТаблиця: Основні фінансові показники кооперативних банків у Європі\n\n\nДинаміка активів кооперативних банків у Європі\n\nІсторія кооперативних банків\n\nІсторія кооперативних банків починається з Генрі Дункана у Шотландії у 1798 році. Значний внесок у розвиток кооперативних банків також зробили Герман Шульц в Німеччині та Фрідріх Вільгельм Райффайзен. Вони засновували банки, де вкладники та позичальники були частиною тієї ж спільноти, що формулювали рівні можливості у розподілі прав та відповідальностей.\n\nКооперативні банки в світі\n\nКооперативні банки поширюються в різних країнах світу, зокрема в Канаді та Європі. В Канаді такі установи трансформувались в кредитні каси. Найбільшими кооперативними банками в Європі є Креді Агриколь Банк, Le Crédit Mutuel, Rabobank та інші. У 2020 році кооперативні банки в Європі мали значну частку депозитів у своїх країнах.'
+    tex1 = 'Борiтеся – поборете, Вам Бог помагає!'
+    tex2 = 'борiтесь – поборете, Вам Бог помага!'
     print('CER', calculate_cer(tex1, tex2))
     print('WER', calculate_wer(tex1, tex2))
 
-    
+
