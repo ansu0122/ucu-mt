@@ -62,7 +62,8 @@ class QwenVL2_LLM:
         gen_args = dict(
             max_new_tokens=self.max_new_tokens,
             use_cache=True,
-            # temperature=1.0,
+            num_beams=1,  # Greedy decoding
+            temperature=0.001,
             # min_p = 0.1
         )
 
