@@ -173,3 +173,5 @@ unsloth*/
 train_outputs/
 wandb/
 .vscode/
+
+*drawio*
