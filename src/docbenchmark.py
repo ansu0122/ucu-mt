@@ -15,7 +15,7 @@ def eval_ocr(dataset, prediction_path, region_types=None):
 
     mean_cer = dm.mean_cer(ground_truth, prediction)
     mean_wer = dm.mean_wer(ground_truth, prediction)
-    print(f"Mean CCR (overall): {(1 - mean_cer) * 100:.4f}% | Mean WCR: {(1 - mean_wer) * 100:.4f}%")
+    print(f"Mean CCR (overall): {(1 - mean_cer) * 100:.1f}% | Mean WCR: {(1 - mean_wer) * 100:.1f}%")
 
     # Evaluate by style
     for style in ['print', 'hand', 'scan']:
@@ -25,7 +25,7 @@ def eval_ocr(dataset, prediction_path, region_types=None):
         mean_cer_style = dm.mean_cer(ground_truth_style, prediction)
         mean_wer_style = dm.mean_wer(ground_truth_style, prediction)
         
-        print(f"Mean CCR ({style}): {(1 - mean_cer_style) * 100:.4f}% | Mean WCR ({style}): {(1 - mean_wer_style) * 100:.4f}%")
+        print(f"Mean CCR ({style}): {(1 - mean_cer_style) * 100:.1f}% | Mean WCR ({style}): {(1 - mean_wer_style) * 100:.1f}%")
 
 
 def eval_table_extraction(dataset, prediction_path, region_types=['table']):
@@ -37,7 +37,7 @@ def eval_table_extraction(dataset, prediction_path, region_types=['table']):
     ground_truth = {key: su.fetch_html_table(item) for key, item in ground_truth.items() if key in prediction}
 
     mean_teds = dm.mean_teds(ground_truth, prediction)
-    print(f"Mean TEDS (overall): {mean_teds * 100:.4f}%")
+    print(f"Mean TEDS (overall): {mean_teds * 100:.1f}%")
 
     # Evaluate TEDS by style
     for style in ['print', 'hand', 'scan']:
@@ -48,7 +48,7 @@ def eval_table_extraction(dataset, prediction_path, region_types=['table']):
         }
 
         mean_teds_style = dm.mean_teds(ground_truth_style, prediction)
-        print(f"Mean TEDS ({style}): {mean_teds_style * 100:.4f}%")
+        print(f"Mean TEDS ({style}): {mean_teds_style * 100:.1f}%")
 
 
 def eval_layout_analysis(dataset, prediction_path, region_types=None):
@@ -60,7 +60,7 @@ def eval_layout_analysis(dataset, prediction_path, region_types=None):
     ground_truth = {key: item for key, item in ground_truth.items() if key in prediction}
 
     moss = dm.mean_oss(ground_truth, prediction)
-    print(f"Mean OSS (overall): {moss * 100:.4f}%")
+    print(f"Mean OSS (overall): {moss * 100:.1f}%")
 
     # Evaluate OSS by style
     for style in ['print', 'hand', 'scan']:
@@ -70,7 +70,7 @@ def eval_layout_analysis(dataset, prediction_path, region_types=None):
         }
 
         moss_style = dm.mean_oss(ground_truth_style, prediction)
-        print(f"Mean OSS ({style}): {moss_style * 100:.4f}%")
+        print(f"Mean OSS ({style}): {moss_style * 100:.1f}%")
 
 
 def eval_classification(dataset, prediction_path):
@@ -80,7 +80,7 @@ def eval_classification(dataset, prediction_path):
     # Extract overall ground truth
     ground_truth = {item['id']: item['category'] for item in dataset if item['id'] in prediction}
     acc = dm.accuracy(ground_truth, prediction)
-    print(f"Accuracy (overall): {acc * 100:.4f}%")
+    print(f"Accuracy (overall): {acc * 100:.1f}%")
 
     # Optional: Style-wise accuracy
     for style in ['print', 'hand', 'scan']:
@@ -92,7 +92,7 @@ def eval_classification(dataset, prediction_path):
 
         if ground_truth_style:
             acc_style = dm.accuracy(ground_truth_style, prediction)
-            print(f"Accuracy ({style}): {acc_style * 100:.4f}%")
+            print(f"Accuracy ({style}): {acc_style * 100:.1f}%")
 
 def ocr_bench(dataset):
     #Tesseract
@@ -143,11 +143,11 @@ def ocr_bench(dataset):
     # Phi4VL
     print("Benchmark: OCRText")
     print("Model: Phi4VL")
-    eval_ocr(dataset, 'results/ocr_text_phi4vl.jsonl', region_types=['text'])
+    eval_ocr(dataset, 'results/ocr_text_phi4vl_v2.jsonl', region_types=['text'])
 
     print("Benchmark: OCRDoc")
     print("Model: Phi4VL")
-    eval_ocr(dataset, 'results/ocr_whole_doc_phi4vl.jsonl', region_types=None)
+    eval_ocr(dataset, 'results/ocr_whole_doc_phi4vl_v2.jsonl', region_types=None)
 
     # Aya8VL
     print("Benchmark: OCRText")
@@ -185,7 +185,7 @@ def tabext_bench(dataset):
 
     print("Benchmark: TEDSDoc")
     print("Model: Qwen2VL_4bit")
-    eval_table_extraction(dataset, 'results/table_whole_doc_qwen2vl_4bit.jsonl', region_types=None)
+    eval_table_extraction(dataset, 'results/table_whole_doc_qwen2vl_4bit_v2.jsonl', region_types=None)
 
     # Qwen2VL
     print("Benchmark: TEDSTab")
@@ -194,7 +194,7 @@ def tabext_bench(dataset):
 
     print("Benchmark: TEDSDoc")
     print("Model: Qwen2VL")
-    eval_table_extraction(dataset, 'results/table_whole_doc_qwen2vl.jsonl', region_types=None)
+    eval_table_extraction(dataset, 'results/table_whole_doc_qwen2vl_v2.jsonl', region_types=None)
 
     # Qwen2.5VL
     print("Benchmark: TEDSTab")
@@ -217,11 +217,11 @@ def tabext_bench(dataset):
     # Phi4VL
     print("Benchmark: TEDSTab")
     print("Model: Phi4VL")
-    eval_table_extraction(dataset, 'results/table_table_phi4vl.jsonl', region_types=['table'])
+    eval_table_extraction(dataset, 'results/table_table_phi4vl_v2.jsonl', region_types=['table'])
 
     print("Benchmark: TEDSDoc")
     print("Model: Phi4VL")
-    eval_table_extraction(dataset, 'results/table_whole_doc_phi4vl.jsonl', region_types=None)
+    eval_table_extraction(dataset, 'results/table_whole_doc_phi4vl_v2.jsonl', region_types=None)
 
     # Aya8VL
     print("Benchmark: TEDSTab")
@@ -260,7 +260,7 @@ def layout_bench(dataset):
     # Qwen2VL
     print("Benchmark: MOSSLay")
     print("Model: Qwen2VL")
-    eval_layout_analysis(dataset, 'results/layout_whole_doc_qwen2vl.jsonl')
+    eval_layout_analysis(dataset, 'results/layout_whole_doc_qwen2vl_v2.jsonl')
 
     # Qwen2.5VL
     print("Benchmark: MOSSLay")
@@ -275,7 +275,7 @@ def layout_bench(dataset):
     # Phi4VL
     print("Benchmark: MOSSLay")
     print("Model: Phi4VL")
-    eval_layout_analysis(dataset, 'results/layout_whole_doc_phi4vl.jsonl')
+    eval_layout_analysis(dataset, 'results/layout_whole_doc_phi4vl_v2.jsonl')
 
     # Aya8VL
     print("Benchmark: MOSSLay")
@@ -317,7 +317,7 @@ def class_bench(dataset):
     # Phi4VL
     print("Benchmark: Class")
     print("Model: Phi4VL")
-    eval_classification(dataset, 'results/class_whole_doc_phi4vl.jsonl')
+    eval_classification(dataset, 'results/class_whole_doc_phi4vl_v2.jsonl')
 
     # Aya8VL
     print("Benchmark: Class")
