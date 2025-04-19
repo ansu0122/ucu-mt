@@ -171,7 +171,7 @@ def mean_oss(ground_truth: dict, predictions: dict, verbose: bool = False) -> fl
 def ordered_sequence_similarity(
     ground_truth: list, 
     predictions: list, 
-    threshold: float = 0.75, 
+    threshold: float = 0.6, 
     max_roll: int = 5,
     verbose: bool = False
 ) -> float:
@@ -185,28 +185,45 @@ def ordered_sequence_similarity(
 
     total_score = 0.0
     matches = 0
+    used_pred_indices = set()
 
     for i in range(len(gt_vec)):
         gt_title_vec = gt_vec[i].reshape(1, -1)
-        score = 0.0
+        best_score = 0.0
+        best_index = -1
+        best_decay = 1.0
 
-        for offset in range(max_roll + 1):
+        # Search from i - max_roll to i + max_roll
+        for offset in range(-max_roll, max_roll + 1):
             pred_index = i + offset
-            if pred_index >= len(pred_vec):
-                break
+            if pred_index < 0 or pred_index >= len(pred_vec):
+                continue
+            if pred_index in used_pred_indices:
+                continue
 
             pred_title_vec = pred_vec[pred_index].reshape(1, -1)
             sim = cosine_similarity(gt_title_vec, pred_title_vec)[0][0]
 
-            if sim >= threshold or offset == 0:
-                # Apply soft penalty for distance from ideal position
-                decay = 1.0 / (1 + offset)
-                score = sim * decay
-                if verbose:
-                    print(f"GT[{i}] matched to Pred[{pred_index}] with sim={sim:.2f}, decay={decay:.2f}")
-                break  # take the first match above threshold (or fallback to offset=0 match)
+            if sim >= threshold:
+                decay = 1.0 / (1 + abs(offset)/len(pred_vec))  # decay based on distance
+                adjusted_score = sim * decay
 
-        total_score += score
+                if adjusted_score > best_score:
+                    best_score = adjusted_score
+                    best_index = pred_index
+                    best_decay = decay
+
+        if best_index != -1:
+            used_pred_indices.add(best_index)
+            total_score += best_score
+            if verbose:
+                print(f"GT[{i}] matched to Pred[{best_index}] | sim={best_score / best_decay:.2f}, decay={best_decay:.2f}, score={best_score:.2f}")
+        else:
+            # No match found above threshold
+            if verbose:
+                print(f"GT[{i}] has no match above threshold")
+            total_score += 0.0
+
         matches += 1
 
     return total_score / matches if matches > 0 else 0.0
@@ -220,10 +237,10 @@ def accuracy(ground_truth: dict, predictions: dict) -> float:
 
 if __name__ == "__main__":
 
-    predicted_titles = ["Introduction", "Conclusion", "Results and Discussion", "Methodology"]
     ground_truth_titles = ["Introduction", "Methodology", "Results and Discussion", "Conclusion"]
-
-    similarity = ordered_sequence_similarity(predicted_titles, ground_truth_titles)
+    predicted_titles = ["Introduction", "Methodology", "Results Discussion", "Conclusion"]
+    
+    similarity = ordered_sequence_similarity(ground_truth_titles, predicted_titles, verbose=True)
 
     print("Cosine Similarity (Sequence-Level):", similarity)
 
