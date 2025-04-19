@@ -60,16 +60,16 @@ Mean CCR (hand): 98.2% | Mean WCR (hand): 95.9%
 Mean CCR (scan): 99.4% | Mean WCR (scan): 98.5%
 Benchmark: OCRText
 Model: Phi4VL
-Mean CCR (overall): 6.2% | Mean WCR: -26.8%
-Mean CCR (print): 36.2% | Mean WCR (print): 17.0%
-Mean CCR (hand): -45.8% | Mean WCR (hand): -100.4%
-Mean CCR (scan): 53.6% | Mean WCR (scan): 38.6%
+Mean CCR (overall): 2.4% | Mean WCR: -34.1%
+Mean CCR (print): 32.0% | Mean WCR (print): 8.3%
+Mean CCR (hand): -55.5% | Mean WCR (hand): -104.0%
+Mean CCR (scan): 49.3% | Mean WCR (scan): 13.0%
 Benchmark: OCRDoc
 Model: Phi4VL
-Mean CCR (overall): 29.0% | Mean WCR: 6.2%
-Mean CCR (print): 41.6% | Mean WCR (print): 24.9%
-Mean CCR (hand): 10.9% | Mean WCR (hand): -21.3%
-Mean CCR (scan): 35.8% | Mean WCR (scan): 18.4%
+Mean CCR (overall): 36.4% | Mean WCR: 15.3%
+Mean CCR (print): 39.2% | Mean WCR (print): 17.3%
+Mean CCR (hand): 17.4% | Mean WCR (hand): -10.1%
+Mean CCR (scan): 46.1% | Mean WCR (scan): 31.0%
 Benchmark: OCRText
 Model: Aya8VL
 Mean CCR (overall): -338.4% | Mean WCR: -378.2%
@@ -114,10 +114,10 @@ Mean TEDS (hand): 86.9%
 Mean TEDS (scan): 82.9%
 Benchmark: TEDSDoc
 Model: Qwen2VL_4bit
-Mean TEDS (overall): 67.1%
-Mean TEDS (print): 67.3%
-Mean TEDS (hand): 64.8%
-Mean TEDS (scan): 69.5%
+Mean TEDS (overall): 83.0%
+Mean TEDS (print): 82.0%
+Mean TEDS (hand): 84.1%
+Mean TEDS (scan): 82.8%
 Benchmark: TEDSTab
 Model: Qwen2VL
 Mean TEDS (overall): 83.0%
@@ -126,10 +126,10 @@ Mean TEDS (hand): 85.1%
 Mean TEDS (scan): 81.4%
 Benchmark: TEDSDoc
 Model: Qwen2VL
-Mean TEDS (overall): 67.1%
-Mean TEDS (print): 67.4%
-Mean TEDS (hand): 68.7%
-Mean TEDS (scan): 63.7%
+Mean TEDS (overall): 83.7%
+Mean TEDS (print): 80.6%
+Mean TEDS (hand): 84.5%
+Mean TEDS (scan): 87.7%
 Benchmark: TEDSTab
 Model: Qwen2.5VL
 Mean TEDS (overall): 88.5%
@@ -156,16 +156,16 @@ Mean TEDS (hand): 97.8%
 Mean TEDS (scan): 98.5%
 Benchmark: TEDSTab
 Model: Phi4VL
-Mean TEDS (overall): 83.6%
-Mean TEDS (print): 82.5%
+Mean TEDS (overall): 83.4%
+Mean TEDS (print): 83.8%
 Mean TEDS (hand): 85.8%
-Mean TEDS (scan): 83.7%
+Mean TEDS (scan): 80.8%
 Benchmark: TEDSDoc
 Model: Phi4VL
-Mean TEDS (overall): 77.3%
-Mean TEDS (print): 77.9%
-Mean TEDS (hand): 83.7%
-Mean TEDS (scan): 71.8%
+Mean TEDS (overall): 75.9%
+Mean TEDS (print): 75.6%
+Mean TEDS (hand): 73.5%
+Mean TEDS (scan): 78.8%
 Benchmark: TEDSTab
 Model: Aya8VL
 Mean TEDS (overall): 74.9%
@@ -204,52 +204,52 @@ Mean TEDS (hand): 86.4%
 Mean TEDS (scan): 86.8%
 Benchmark: MOSSLay
 Model: Qwen2VL_4bit
-Mean OSS (overall): 62.0%
-Mean OSS (print): 64.1%
-Mean OSS (hand): 58.6%
-Mean OSS (scan): 63.6%
+Mean OSS (overall): 91.7%
+Mean OSS (print): 92.4%
+Mean OSS (hand): 91.3%
+Mean OSS (scan): 91.7%
 Benchmark: MOSSLay
 Model: Qwen2VL
-Mean OSS (overall): 63.2%
-Mean OSS (print): 64.0%
-Mean OSS (hand): 61.4%
-Mean OSS (scan): 64.6%
+Mean OSS (overall): 92.3%
+Mean OSS (print): 92.8%
+Mean OSS (hand): 92.0%
+Mean OSS (scan): 92.1%
 Benchmark: MOSSLay
 Model: Qwen2.5VL
-Mean OSS (overall): 70.8%
-Mean OSS (print): 72.7%
-Mean OSS (hand): 67.1%
-Mean OSS (scan): 72.4%
+Mean OSS (overall): 93.1%
+Mean OSS (print): 93.5%
+Mean OSS (hand): 92.6%
+Mean OSS (scan): 93.3%
 Benchmark: MOSSLay
 Model: Qwen2.5VL_Ada
-Mean OSS (overall): 90.8%
-Mean OSS (print): 92.9%
-Mean OSS (hand): 86.5%
-Mean OSS (scan): 92.5%
+Mean OSS (overall): 97.0%
+Mean OSS (print): 97.5%
+Mean OSS (hand): 96.2%
+Mean OSS (scan): 97.2%
 Benchmark: MOSSLay
 Model: Phi4VL
-Mean OSS (overall): 50.2%
-Mean OSS (print): 57.6%
-Mean OSS (hand): 48.9%
-Mean OSS (scan): 45.5%
+Mean OSS (overall): 91.3%
+Mean OSS (print): 91.2%
+Mean OSS (hand): 90.6%
+Mean OSS (scan): 92.2%
 Benchmark: MOSSLay
 Model: Aya8VL
-Mean OSS (overall): 57.5%
-Mean OSS (print): 59.8%
-Mean OSS (hand): 55.3%
-Mean OSS (scan): 57.3%
+Mean OSS (overall): 91.6%
+Mean OSS (print): 92.0%
+Mean OSS (hand): 91.4%
+Mean OSS (scan): 91.3%
 Benchmark: MOSSLay
 Model: MistralOCR
-Mean OSS (overall): 69.8%
-Mean OSS (print): 71.7%
-Mean OSS (hand): 61.0%
-Mean OSS (scan): 75.6%
+Mean OSS (overall): 93.1%
+Mean OSS (print): 93.1%
+Mean OSS (hand): 92.1%
+Mean OSS (scan): 93.9%
 Benchmark: MOSSLay
 Model: Gemini2.0 Flash
-Mean OSS (overall): 73.6%
-Mean OSS (print): 74.7%
-Mean OSS (hand): 71.3%
-Mean OSS (scan): 74.8%
+Mean OSS (overall): 93.5%
+Mean OSS (print): 93.6%
+Mean OSS (hand): 93.1%
+Mean OSS (scan): 93.8%
 Benchmark: Class
 Model: Qwen2VL_4bit
 Accuracy (overall): 92.8%
@@ -276,10 +276,10 @@ Accuracy (hand): 91.7%
 Accuracy (scan): 92.2%
 Benchmark: Class
 Model: Phi4VL
-Accuracy (overall): 59.2%
+Accuracy (overall): 58.7%
 Accuracy (print): 61.0%
-Accuracy (hand): 47.5%
-Accuracy (scan): 68.8%
+Accuracy (hand): 46.7%
+Accuracy (scan): 67.9%
 Benchmark: Class
 Model: Aya8VL
 Accuracy (overall): 77.2%
