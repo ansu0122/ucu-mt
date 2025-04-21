@@ -131,15 +131,6 @@ def ocr_bench(dataset):
     print("Model: Qwen2.5VL")
     eval_ocr(dataset, 'results/ocr_whole_doc_qwen25vl.jsonl', region_types=None)
 
-    # Qwen2.5VL_Ada
-    print("Benchmark: OCRText")
-    print("Model: Qwen2.5VL_Ada")
-    eval_ocr(dataset, 'results/ocr_text_qwen25vl_ada.jsonl', region_types=['text'])
-
-    print("Benchmark: OCRDoc")
-    print("Model: Qwen2.5VL_Ada")
-    eval_ocr(dataset, 'results/ocr_whole_doc_qwen25vl_ada.jsonl', region_types=None)
-
     # Phi4VL
     print("Benchmark: OCRText")
     print("Model: Phi4VL")
@@ -176,6 +167,32 @@ def ocr_bench(dataset):
     print("Model: Gemini2.0 Flash")
     eval_ocr(dataset, 'results/ocr_whole_doc_gemini.jsonl', region_types=None)
 
+# Qwen2.5VL_Ada_r16_alpha16
+    print("Benchmark: OCRText")
+    print("Model: Qwen2.5VL_Ada_r16_alpha16")
+    eval_ocr(dataset, 'results/ocr_text_qwen25vl_ada.jsonl', region_types=['text'])
+
+    print("Benchmark: OCRDoc")
+    print("Model: Qwen2.5VL_Ada_r16_alpha16")
+    eval_ocr(dataset, 'results/ocr_whole_doc_qwen25vl_ada.jsonl', region_types=None)
+
+# Qwen2.5VL_Ada_r16_alpha32
+    print("Benchmark: OCRText")
+    print("Model: Qwen2.5VL_Ada_r16_alpha32")
+    eval_ocr(dataset, 'results/ocr_text_qwen25vl_ada_exp2.jsonl', region_types=['text'])
+
+    print("Benchmark: OCRDoc")
+    print("Model: Qwen2.5VL_Ada_r16_alpha32")
+    eval_ocr(dataset, 'results/ocr_whole_doc_qwen25vl_ada_exp2.jsonl', region_types=None)
+
+# Qwen2.5VL_Ada_r32_alpha32
+    print("Benchmark: OCRText")
+    print("Model: Qwen2.5VL_Ada_r32_alpha32")
+    eval_ocr(dataset, 'results/ocr_text_qwen25vl_ada_exp3.jsonl', region_types=['text'])
+
+    print("Benchmark: OCRDoc")
+    print("Model: Qwen2.5VL_Ada_r32_alpha32")
+    eval_ocr(dataset, 'results/ocr_whole_doc_qwen25vl_ada_exp3.jsonl', region_types=None)
 
 def tabext_bench(dataset):
     # Qwen2VL-4bit
@@ -204,15 +221,6 @@ def tabext_bench(dataset):
     print("Benchmark: TEDSDoc")
     print("Model: Qwen2.5VL")
     eval_table_extraction(dataset, 'results/table_whole_doc_qwen25vl.jsonl', region_types=None)
-
-    # Qwen2.5VL_Ada
-    print("Benchmark: TEDSTab")
-    print("Model: Qwen2.5VL_Ada")
-    eval_table_extraction(dataset, 'results/table_table_qwen25vl_ada.jsonl', region_types=['table'])
-
-    print("Benchmark: TEDSDoc")
-    print("Model: Qwen2.5VL_Ada")
-    eval_table_extraction(dataset, 'results/table_whole_doc_qwen25vl_ada.jsonl', region_types=None)
 
     # Phi4VL
     print("Benchmark: TEDSTab")
@@ -250,6 +258,34 @@ def tabext_bench(dataset):
     print("Model: Gemini2.0 Flash")
     eval_table_extraction(dataset, 'results/table_whole_doc_gemini.jsonl', region_types=None)
 
+    # Qwen2.5VL_Ada_r16_alpha16
+    print("Benchmark: TEDSTab")
+    print("Model: Qwen2.5VL_Ada_r16_alpha16")
+    eval_table_extraction(dataset, 'results/table_table_qwen25vl_ada.jsonl', region_types=['table'])
+
+    print("Benchmark: TEDSDoc")
+    print("Model: Qwen2.5VL_Ada_r16_alpha16")
+    eval_table_extraction(dataset, 'results/table_whole_doc_qwen25vl_ada.jsonl', region_types=None)
+
+    # Qwen2.5VL_Ada_r16_alpha32
+    print("Benchmark: TEDSTab")
+    print("Model: Qwen2.5VL_Ada_r16_alpha32")
+    eval_table_extraction(dataset, 'results/table_table_qwen25vl_ada_exp2.jsonl', region_types=['table'])
+
+    print("Benchmark: TEDSDoc")
+    print("Model: Qwen2.5VL_Ada_r16_alpha32")
+    eval_table_extraction(dataset, 'results/table_whole_doc_qwen25vl_ada_exp2.jsonl', region_types=None)
+
+    # Qwen2.5VL_Ada_r32_alpha32
+    print("Benchmark: TEDSTab")
+    print("Model: Qwen2.5VL_Ada_r32_alpha32")
+    eval_table_extraction(dataset, 'results/table_table_qwen25vl_ada_exp3.jsonl', region_types=['table'])
+
+    print("Benchmark: TEDSDoc")
+    print("Model: Qwen2.5VL_Ada_r32_alpha32")
+    eval_table_extraction(dataset, 'results/table_whole_doc_qwen25vl_ada_exp3.jsonl', region_types=None)
+
+
 
 def layout_bench(dataset):
     # Qwen2VL-4bit
@@ -266,11 +302,6 @@ def layout_bench(dataset):
     print("Benchmark: MOSSLay")
     print("Model: Qwen2.5VL")
     eval_layout_analysis(dataset, 'results/layout_whole_doc_qwen25vl.jsonl')
-
-    # Qwen2.5VL_Ada
-    print("Benchmark: MOSSLay")
-    print("Model: Qwen2.5VL_Ada")
-    eval_layout_analysis(dataset, 'results/layout_whole_doc_qwen25vl_ada.jsonl')
 
     # Phi4VL
     print("Benchmark: MOSSLay")
@@ -292,6 +323,21 @@ def layout_bench(dataset):
     print("Model: Gemini2.0 Flash")
     eval_layout_analysis(dataset, 'results/layout_whole_doc_gemini.jsonl')
 
+    # Qwen2.5VL_Ada_r16_alpha16
+    print("Benchmark: MOSSLay")
+    print("Model: Qwen2.5VL_Ada_r16_alpha16")
+    eval_layout_analysis(dataset, 'results/layout_whole_doc_qwen25vl_ada.jsonl')
+
+    # Qwen2.5VL_Ada_r16_alpha32
+    print("Benchmark: MOSSLay")
+    print("Model: Qwen2.5VL_Ada_r16_alpha32")
+    eval_layout_analysis(dataset, 'results/layout_whole_doc_qwen25vl_ada_exp2.jsonl')
+
+    # Qwen2.5VL_Ada_r32_alpha32
+    print("Benchmark: MOSSLay")
+    print("Model: Qwen2.5VL_Ada_r32_alpha32")
+    eval_layout_analysis(dataset, 'results/layout_whole_doc_qwen25vl_ada_exp3.jsonl')
+
 
 def class_bench(dataset):
     # Qwen2VL-4bit
@@ -308,11 +354,6 @@ def class_bench(dataset):
     print("Benchmark: Class")
     print("Model: Qwen2.5VL")
     eval_classification(dataset, 'results/class_whole_doc_qwen25vl.jsonl')
-
-    # Qwen2.5VL_Ada
-    print("Benchmark: Class")
-    print("Model: Qwen2.5VL_Ada")
-    eval_classification(dataset, 'results/class_whole_doc_qwen25vl_ada.jsonl')
 
     # Phi4VL
     print("Benchmark: Class")
@@ -333,6 +374,21 @@ def class_bench(dataset):
     print("Benchmark: Class")
     print("Model: Gemini2.0 Flash")
     eval_classification(dataset, 'results/class_whole_doc_gemini.jsonl')
+
+    # Qwen2.5VL_Ada_r16_alpha16
+    print("Benchmark: Class")
+    print("Model: Qwen2.5VL_Ada_r16_alpha16")
+    eval_classification(dataset, 'results/class_whole_doc_qwen25vl_ada.jsonl')
+
+    # Qwen2.5VL_Ada_r16_alpha32
+    print("Benchmark: Class")
+    print("Model: Qwen2.5VL_Ada_r16_alpha32")
+    eval_classification(dataset, 'results/class_whole_doc_qwen25vl_ada_exp2.jsonl')
+
+    # Qwen2.5VL_Ada_r32_alpha32
+    print("Benchmark: Class")
+    print("Model: Qwen2.5VL_Ada_r32_alpha32")
+    eval_classification(dataset, 'results/class_whole_doc_qwen25vl_ada_exp3.jsonl')
 
 
 if __name__ == "__main__":
