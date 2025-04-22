@@ -1,0 +1,410 @@
+Benchmark: OCRText
+Model: Tesseract
+Mean CCR (overall): 89.2% | Mean WCR: 74.0%
+Mean CCR (print): 96.5% | Mean WCR (print): 95.9%
+Mean CCR (hand): 76.5% | Mean WCR (hand): 32.3%
+Mean CCR (scan): 95.4% | Mean WCR (scan): 96.2%
+Benchmark: OCRDoc
+Model: Tesseract
+Mean CCR (overall): 77.1% | Mean WCR: 59.9%
+Mean CCR (print): 82.2% | Mean WCR (print): 78.9%
+Mean CCR (hand): 69.7% | Mean WCR (hand): 24.2%
+Mean CCR (scan): 79.3% | Mean WCR (scan): 78.6%
+Benchmark: OCRText
+Model: Qwen2VL_4bit
+Mean CCR (overall): 91.9% | Mean WCR: 88.7%
+Mean CCR (print): 97.9% | Mean WCR (print): 95.1%
+Mean CCR (hand): 84.8% | Mean WCR (hand): 80.0%
+Mean CCR (scan): 95.4% | Mean WCR (scan): 94.1%
+Benchmark: OCRDoc
+Model: Qwen2VL_4bit
+Mean CCR (overall): 86.9% | Mean WCR: 84.6%
+Mean CCR (print): 91.6% | Mean WCR (print): 90.3%
+Mean CCR (hand): 82.4% | Mean WCR (hand): 77.7%
+Mean CCR (scan): 86.9% | Mean WCR (scan): 87.2%
+Benchmark: OCRText
+Model: Qwen2VL
+Mean CCR (overall): 92.3% | Mean WCR: 89.3%
+Mean CCR (print): 98.1% | Mean WCR (print): 95.7%
+Mean CCR (hand): 84.0% | Mean WCR (hand): 79.7%
+Mean CCR (scan): 97.1% | Mean WCR (scan): 95.4%
+Benchmark: OCRDoc
+Model: Qwen2VL
+Mean CCR (overall): 88.0% | Mean WCR: 86.5%
+Mean CCR (print): 89.9% | Mean WCR (print): 88.9%
+Mean CCR (hand): 87.0% | Mean WCR (hand): 84.4%
+Mean CCR (scan): 86.2% | Mean WCR (scan): 86.3%
+Benchmark: OCRText
+Model: Qwen2.5VL
+Mean CCR (overall): 98.4% | Mean WCR: 95.6%
+Mean CCR (print): 99.1% | Mean WCR (print): 97.0%
+Mean CCR (hand): 97.8% | Mean WCR (hand): 94.0%
+Mean CCR (scan): 98.5% | Mean WCR (scan): 96.4%
+Benchmark: OCRDoc
+Model: Qwen2.5VL
+Mean CCR (overall): 89.2% | Mean WCR: 87.5%
+Mean CCR (print): 94.5% | Mean WCR (print): 93.4%
+Mean CCR (hand): 84.0% | Mean WCR (hand): 81.4%
+Mean CCR (scan): 90.7% | Mean WCR (scan): 89.8%
+Benchmark: OCRText
+Model: Qwen2.5VL_Ada
+Mean CCR (overall): 99.2% | Mean WCR: 97.4%
+Mean CCR (print): 99.4% | Mean WCR (print): 97.9%
+Mean CCR (hand): 98.5% | Mean WCR (hand): 95.8%
+Mean CCR (scan): 99.6% | Mean WCR (scan): 98.3%
+Benchmark: OCRDoc
+Model: Qwen2.5VL_Ada
+Mean CCR (overall): 98.9% | Mean WCR: 97.4%
+Mean CCR (print): 99.0% | Mean WCR (print): 97.7%
+Mean CCR (hand): 98.2% | Mean WCR (hand): 95.9%
+Mean CCR (scan): 99.4% | Mean WCR (scan): 98.5%
+Benchmark: OCRText
+Model: Phi4VL
+Mean CCR (overall): 2.4% | Mean WCR: -34.1%
+Mean CCR (print): 32.0% | Mean WCR (print): 8.3%
+Mean CCR (hand): -55.5% | Mean WCR (hand): -104.0%
+Mean CCR (scan): 49.3% | Mean WCR (scan): 13.0%
+Benchmark: OCRDoc
+Model: Phi4VL
+Mean CCR (overall): 36.4% | Mean WCR: 15.3%
+Mean CCR (print): 39.2% | Mean WCR (print): 17.3%
+Mean CCR (hand): 17.4% | Mean WCR (hand): -10.1%
+Mean CCR (scan): 46.1% | Mean WCR (scan): 31.0%
+Benchmark: OCRText
+Model: Aya8VL
+Mean CCR (overall): -338.4% | Mean WCR: -378.2%
+Mean CCR (print): -313.3% | Mean WCR (print): -340.6%
+Mean CCR (hand): -337.4% | Mean WCR (hand): -380.9%
+Mean CCR (scan): -369.3% | Mean WCR (scan): -421.4%
+Benchmark: OCRDoc
+Model: Aya8VL
+Mean CCR (overall): -35.0% | Mean WCR: -53.6%
+Mean CCR (print): -4.2% | Mean WCR (print): -26.2%
+Mean CCR (hand): -92.7% | Mean WCR (hand): -113.1%
+Mean CCR (scan): -29.2% | Mean WCR (scan): -41.2%
+Benchmark: OCRText
+Model: MistralOCR
+Mean CCR (overall): 93.4% | Mean WCR: 82.7%
+Mean CCR (print): 98.5% | Mean WCR (print): 98.7%
+Mean CCR (hand): 82.8% | Mean WCR (hand): 49.8%
+Mean CCR (scan): 98.4% | Mean WCR (scan): 98.0%
+Benchmark: OCRDoc
+Model: MistralOCR
+Mean CCR (overall): 87.6% | Mean WCR: 79.6%
+Mean CCR (print): 91.5% | Mean WCR (print): 91.8%
+Mean CCR (hand): 77.8% | Mean WCR (hand): 48.3%
+Mean CCR (scan): 91.2% | Mean WCR (scan): 91.8%
+Benchmark: OCRText
+Model: Gemini2.0 Flash
+Mean CCR (overall): 98.4% | Mean WCR: 99.2%
+Mean CCR (print): 98.7% | Mean WCR (print): 99.6%
+Mean CCR (hand): 98.4% | Mean WCR (hand): 99.0%
+Mean CCR (scan): 97.8% | Mean WCR (scan): 98.9%
+Benchmark: OCRDoc
+Model: Gemini2.0 Flash
+Mean CCR (overall): 90.3% | Mean WCR: 91.2%
+Mean CCR (print): 90.4% | Mean WCR (print): 91.5%
+Mean CCR (hand): 90.1% | Mean WCR (hand): 90.3%
+Mean CCR (scan): 90.5% | Mean WCR (scan): 91.7%
+Benchmark: TEDSTab
+Model: Qwen2VL_4bit
+Mean TEDS (overall): 83.9%
+Mean TEDS (print): 81.6%
+Mean TEDS (hand): 86.9%
+Mean TEDS (scan): 82.9%
+Benchmark: TEDSDoc
+Model: Qwen2VL_4bit
+Mean TEDS (overall): 83.0%
+Mean TEDS (print): 82.0%
+Mean TEDS (hand): 84.1%
+Mean TEDS (scan): 82.8%
+Benchmark: TEDSTab
+Model: Qwen2VL
+Mean TEDS (overall): 83.0%
+Mean TEDS (print): 81.9%
+Mean TEDS (hand): 85.1%
+Mean TEDS (scan): 81.4%
+Benchmark: TEDSDoc
+Model: Qwen2VL
+Mean TEDS (overall): 83.7%
+Mean TEDS (print): 80.6%
+Mean TEDS (hand): 84.5%
+Mean TEDS (scan): 87.7%
+Benchmark: TEDSTab
+Model: Qwen2.5VL
+Mean TEDS (overall): 88.5%
+Mean TEDS (print): 89.3%
+Mean TEDS (hand): 89.4%
+Mean TEDS (scan): 86.1%
+Benchmark: TEDSDoc
+Model: Qwen2.5VL
+Mean TEDS (overall): 89.1%
+Mean TEDS (print): 87.0%
+Mean TEDS (hand): 91.9%
+Mean TEDS (scan): 88.6%
+Benchmark: TEDSTab
+Model: Qwen2.5VL_Ada
+Mean TEDS (overall): 95.4%
+Mean TEDS (print): 95.0%
+Mean TEDS (hand): 95.2%
+Mean TEDS (scan): 95.9%
+Benchmark: TEDSDoc
+Model: Qwen2.5VL_Ada
+Mean TEDS (overall): 96.7%
+Mean TEDS (print): 94.4%
+Mean TEDS (hand): 97.8%
+Mean TEDS (scan): 98.5%
+Benchmark: TEDSTab
+Model: Phi4VL
+Mean TEDS (overall): 83.4%
+Mean TEDS (print): 83.8%
+Mean TEDS (hand): 85.8%
+Mean TEDS (scan): 80.8%
+Benchmark: TEDSDoc
+Model: Phi4VL
+Mean TEDS (overall): 75.9%
+Mean TEDS (print): 75.6%
+Mean TEDS (hand): 73.5%
+Mean TEDS (scan): 78.8%
+Benchmark: TEDSTab
+Model: Aya8VL
+Mean TEDS (overall): 74.9%
+Mean TEDS (print): 74.8%
+Mean TEDS (hand): 75.1%
+Mean TEDS (scan): 74.7%
+Benchmark: TEDSDoc
+Model: Aya8VL
+Mean TEDS (overall): 65.2%
+Mean TEDS (print): 66.3%
+Mean TEDS (hand): 64.7%
+Mean TEDS (scan): 64.5%
+Benchmark: TEDSTab
+Model: MistralOCR
+Mean TEDS (overall): 84.5%
+Mean TEDS (print): 87.1%
+Mean TEDS (hand): 83.5%
+Mean TEDS (scan): 83.1%
+Benchmark: TEDSDoc
+Model: MistralOCR
+Mean TEDS (overall): 86.1%
+Mean TEDS (print): 85.5%
+Mean TEDS (hand): 87.6%
+Mean TEDS (scan): 85.2%
+Benchmark: TEDSTab
+Model: Gemini2.0 Flash
+Mean TEDS (overall): 87.4%
+Mean TEDS (print): 87.5%
+Mean TEDS (hand): 88.4%
+Mean TEDS (scan): 86.3%
+Benchmark: TEDSDoc
+Model: Gemini2.0 Flash
+Mean TEDS (overall): 85.8%
+Mean TEDS (print): 84.4%
+Mean TEDS (hand): 86.4%
+Mean TEDS (scan): 86.8%
+Benchmark: MOSSLay
+Model: Qwen2VL_4bit
+Mean OSS (overall): 91.7%
+Mean OSS (print): 92.4%
+Mean OSS (hand): 91.3%
+Mean OSS (scan): 91.7%
+Benchmark: MOSSLay
+Model: Qwen2VL
+Mean OSS (overall): 92.3%
+Mean OSS (print): 92.8%
+Mean OSS (hand): 92.0%
+Mean OSS (scan): 92.1%
+Benchmark: MOSSLay
+Model: Qwen2.5VL
+Mean OSS (overall): 93.1%
+Mean OSS (print): 93.5%
+Mean OSS (hand): 92.6%
+Mean OSS (scan): 93.3%
+Benchmark: MOSSLay
+Model: Qwen2.5VL_Ada
+Mean OSS (overall): 97.0%
+Mean OSS (print): 97.5%
+Mean OSS (hand): 96.2%
+Mean OSS (scan): 97.2%
+Benchmark: MOSSLay
+Model: Phi4VL
+Mean OSS (overall): 91.3%
+Mean OSS (print): 91.2%
+Mean OSS (hand): 90.6%
+Mean OSS (scan): 92.2%
+Benchmark: MOSSLay
+Model: Aya8VL
+Mean OSS (overall): 91.6%
+Mean OSS (print): 92.0%
+Mean OSS (hand): 91.4%
+Mean OSS (scan): 91.3%
+Benchmark: MOSSLay
+Model: MistralOCR
+Mean OSS (overall): 93.1%
+Mean OSS (print): 93.1%
+Mean OSS (hand): 92.1%
+Mean OSS (scan): 93.9%
+Benchmark: MOSSLay
+Model: Gemini2.0 Flash
+Mean OSS (overall): 93.5%
+Mean OSS (print): 93.6%
+Mean OSS (hand): 93.1%
+Mean OSS (scan): 93.8%
+Benchmark: Class
+Model: Qwen2VL_4bit
+Accuracy (overall): 92.8%
+Accuracy (print): 91.5%
+Accuracy (hand): 93.9%
+Accuracy (scan): 93.1%
+Benchmark: Class
+Model: Qwen2VL
+Accuracy (overall): 92.2%
+Accuracy (print): 93.8%
+Accuracy (hand): 91.2%
+Accuracy (scan): 91.1%
+Benchmark: Class
+Model: Qwen2.5VL
+Accuracy (overall): 92.7%
+Accuracy (print): 91.7%
+Accuracy (hand): 93.3%
+Accuracy (scan): 93.2%
+Benchmark: Class
+Model: Qwen2.5VL_Ada
+Accuracy (overall): 93.7%
+Accuracy (print): 96.7%
+Accuracy (hand): 91.7%
+Accuracy (scan): 92.2%
+Benchmark: Class
+Model: Phi4VL
+Accuracy (overall): 58.7%
+Accuracy (print): 61.0%
+Accuracy (hand): 46.7%
+Accuracy (scan): 67.9%
+Benchmark: Class
+Model: Aya8VL
+Accuracy (overall): 77.2%
+Accuracy (print): 77.2%
+Accuracy (hand): 75.0%
+Accuracy (scan): 79.3%
+Benchmark: Class
+Model: MistralOCR
+Accuracy (overall): 88.5%
+Accuracy (print): 88.4%
+Accuracy (hand): 87.3%
+Accuracy (scan): 89.9%
+Benchmark: Class
+Model: Gemini2.0 Flash
+Accuracy (overall): 90.5%
+Accuracy (print): 90.7%
+Accuracy (hand): 87.9%
+Accuracy (scan): 92.8%
+
+
+Benchmark: OCRText
+Model: Qwen2.5VL_Ada_r16_alpha16
+Mean CCR (overall): 99.2% | Mean WCR: 97.4%
+Mean CCR (print): 99.4% | Mean WCR (print): 97.9%
+Mean CCR (hand): 98.5% | Mean WCR (hand): 95.8%
+Mean CCR (scan): 99.6% | Mean WCR (scan): 98.3%
+Benchmark: OCRDoc
+Model: Qwen2.5VL_Ada_r16_alpha16
+Mean CCR (overall): 98.9% | Mean WCR: 97.4%
+Mean CCR (print): 99.0% | Mean WCR (print): 97.7%
+Mean CCR (hand): 98.2% | Mean WCR (hand): 95.9%
+Mean CCR (scan): 99.4% | Mean WCR (scan): 98.5%
+Benchmark: OCRText
+Model: Qwen2.5VL_Ada_r16_alpha32
+Mean CCR (overall): 99.2% | Mean WCR: 97.5%
+Mean CCR (print): 99.5% | Mean WCR (print): 98.1%
+Mean CCR (hand): 98.5% | Mean WCR (hand): 96.0%
+Mean CCR (scan): 99.6% | Mean WCR (scan): 98.4%
+Benchmark: OCRDoc
+Model: Qwen2.5VL_Ada_r16_alpha32
+Mean CCR (overall): 99.0% | Mean WCR: 97.6%
+Mean CCR (print): 99.1% | Mean WCR (print): 98.1%
+Mean CCR (hand): 98.3% | Mean WCR (hand): 96.2%
+Mean CCR (scan): 99.4% | Mean WCR (scan): 98.4%
+Benchmark: OCRText
+Model: Qwen2.5VL_Ada_r32_alpha32
+Mean CCR (overall): 99.3% | Mean WCR: 97.7%
+Mean CCR (print): 99.4% | Mean WCR (print): 98.1%
+Mean CCR (hand): 98.9% | Mean WCR (hand): 96.6%
+Mean CCR (scan): 99.5% | Mean WCR (scan): 98.3%
+Benchmark: OCRDoc
+Model: Qwen2.5VL_Ada_r32_alpha32
+Mean CCR (overall): 98.5% | Mean WCR: 97.2%
+Mean CCR (print): 99.0% | Mean WCR (print): 97.9%
+Mean CCR (hand): 97.1% | Mean WCR (hand): 95.4%
+Mean CCR (scan): 99.2% | Mean WCR (scan): 98.2%
+Benchmark: TEDSTab
+Model: Qwen2.5VL_Ada_r16_alpha16
+Mean TEDS (overall): 95.4%
+Mean TEDS (print): 95.0%
+Mean TEDS (hand): 95.2%
+Mean TEDS (scan): 95.9%
+Benchmark: TEDSDoc
+Model: Qwen2.5VL_Ada_r16_alpha16
+Mean TEDS (overall): 96.7%
+Mean TEDS (print): 94.4%
+Mean TEDS (hand): 97.8%
+Mean TEDS (scan): 98.5%
+Benchmark: TEDSTab
+Model: Qwen2.5VL_Ada_r16_alpha32
+Mean TEDS (overall): 95.9%
+Mean TEDS (print): 95.1%
+Mean TEDS (hand): 95.4%
+Mean TEDS (scan): 97.4%
+Benchmark: TEDSDoc
+Model: Qwen2.5VL_Ada_r16_alpha32
+Mean TEDS (overall): 96.5%
+Mean TEDS (print): 94.8%
+Mean TEDS (hand): 96.7%
+Mean TEDS (scan): 98.4%
+Benchmark: TEDSTab
+Model: Qwen2.5VL_Ada_r32_alpha32
+Mean TEDS (overall): 96.4%
+Mean TEDS (print): 95.8%
+Mean TEDS (hand): 97.3%
+Mean TEDS (scan): 96.3%
+Benchmark: TEDSDoc
+Model: Qwen2.5VL_Ada_r32_alpha32
+Mean TEDS (overall): 97.2%
+Mean TEDS (print): 94.7%
+Mean TEDS (hand): 98.6%
+Mean TEDS (scan): 98.9%
+Benchmark: MOSSLay
+Model: Qwen2.5VL_Ada_r16_alpha16
+Mean OSS (overall): 97.0%
+Mean OSS (print): 97.5%
+Mean OSS (hand): 96.2%
+Mean OSS (scan): 97.2%
+Benchmark: MOSSLay
+Model: Qwen2.5VL_Ada_r16_alpha32
+Mean OSS (overall): 97.1%
+Mean OSS (print): 97.6%
+Mean OSS (hand): 96.3%
+Mean OSS (scan): 97.2%
+Benchmark: MOSSLay
+Model: Qwen2.5VL_Ada_r32_alpha32
+Mean OSS (overall): 96.9%
+Mean OSS (print): 97.5%
+Mean OSS (hand): 95.9%
+Mean OSS (scan): 97.1%
+Benchmark: Class
+Model: Qwen2.5VL_Ada_r16_alpha16
+Accuracy (overall): 93.7%
+Accuracy (print): 96.7%
+Accuracy (hand): 91.7%
+Accuracy (scan): 92.2%
+Benchmark: Class
+Model: Qwen2.5VL_Ada_r16_alpha32
+Accuracy (overall): 95.6%
+Accuracy (print): 96.7%
+Accuracy (hand): 93.8%
+Accuracy (scan): 96.1%
+Benchmark: Class
+Model: Qwen2.5VL_Ada_r32_alpha32
+Accuracy (overall): 91.2%
+Accuracy (print): 93.3%
+Accuracy (hand): 87.5%
+Accuracy (scan): 92.2%
