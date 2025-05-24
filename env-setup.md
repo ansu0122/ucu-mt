@@ -40,20 +40,29 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
 source ~/miniconda3/etc/profile.d/conda.sh
 
+
+!pip uninstall unsloth -y && pip install --upgrade --no-cache-dir --no-deps git+https://github.com/unslothai/unsloth.git
+
 ---------------------
 
 ## App Setup
+0. Copy .env to remote machine
+
 1. On your Vast AI instance:
 Run your FastAPI app (on any port, e.g., 7860):
-> uvicorn main:app --host 127.0.0.1 --port 7860
+> pip install "fastapi[all]"
+> cd src
+> uvicorn app:app --host 127.0.0.1 --port 7860
 We use 127.0.0.1 so it listens only on the internal loopback — not accessible publicly.
+
 2. On your local machine, forward the port over SSH:
-> ssh -N -L 7860:localhost:7860 root@<vast-instance-ip>
+> ssh -F /dev/null -N -L 17860:localhost:7860 root@195.0.159.206 -p 16297 -i ~/.ssh/vsai
 - N: don't execute commands remotely
 - L 7860:localhost:7860: forward local port 7860 to remote port 7860
 Replace vastuser@<vast-instance-ip> with your actual SSH login
 Now you can access the FastAPI server on Vast at:
 http://localhost:7860
 This is securely tunneled over SSH and not exposed to the internet.
+
 3. Run the application
 > streamlit run src/client.py
