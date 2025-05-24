@@ -19,10 +19,10 @@ def get_env_vars():
 
 def get_template_options():
     return {
-        "Text Extraction": pt.get_text_template(),
-        "Table Extraction": pt.get_table_template(),
-        "Classify Document": pt.get_class_template(),
-        "Title Extraction": pt.get_title_template(),
+        "Text Extraction": pt.get_text_template().strip(),
+        "Table Extraction": pt.get_table_template().strip(),
+        "Classify Document": pt.get_class_template().strip(),
+        "Title Extraction": pt.get_title_template().strip(),
     }
 
 
@@ -32,11 +32,10 @@ def render_ui():
 
     template_options = get_template_options()
 
-    # --- LEFT: Prompt + Response ---
     with col1:
         selected_label = st.selectbox("Select a prompt template", list(template_options.keys()))
         selected_template = template_options[selected_label]
-        prompt = st.text_area("Prompt", selected_template.format(prompt=""), height=200)
+        prompt = st.text_area("Prompt", selected_template.format(prompt=""), height=300)
 
         submit_disabled = not prompt.strip()
         submit_clicked = st.button("Submit", disabled=submit_disabled)
@@ -65,13 +64,14 @@ def submit_to_api(file, prompt, template, output_placeholder):
     data = {"prompt": formatted_prompt}
 
     try:
-        with st.spinner("Sending request..."):
-            response = requests.post(url, files=files, data=data, headers=headers)
-            response.raise_for_status()
-            result = response.json()
+        with output_placeholder:
+            with st.spinner("Sending request..."):
+                response = requests.post(url, files=files, data=data, headers=headers)
+                response.raise_for_status()
+                result = response.json()
 
-        output_placeholder.subheader("Model Response")
-        output_placeholder.text_area("Response", result["response"], height=300)
+            output_placeholder.subheader("Model Response")
+            output_placeholder.text_area("Response", result["response"], height=300)
 
     except requests.exceptions.RequestException as e:
         output_placeholder.error(f"Request failed: {e}")
