@@ -25,11 +25,11 @@ model, tokenizer = FastVisionModel.from_pretrained(
 )
 
 @app.post("/generate")
-async def generate(file: UploadFile, 
-                   prompt: str = Form(...), 
-                   authorization: str = Header(None), 
+async def generate(file: UploadFile,
+                   authorization: str = Header(None),
+                   prompt: str = Form(...),
+                   temperature: float = Form(0.001),
                    max_new_tokens: int = 4096,
-                   temperature: float = 0.001, 
                    min_p: float = 0.1):
 
     api_key = os.getenv("FAST_API_KEY")
