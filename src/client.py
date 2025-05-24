@@ -28,14 +28,50 @@ def get_template_options():
 
 def render_ui():
     st.title("Ukrainian Document Adapter")
-    col1, col2 = st.columns([2, 1])  # Left: wider for text, Right: narrower for image
+    col1, col2 = st.columns([2, 1])
 
     template_options = get_template_options()
+    base_template_labels = list(template_options.keys())
+
+    if "template_label" not in st.session_state:
+        st.session_state.template_label = base_template_labels[0]
+    if "original_prompt" not in st.session_state:
+        st.session_state.original_prompt = template_options[st.session_state.template_label].format(prompt="")
 
     with col1:
-        selected_label = st.selectbox("Select a prompt template", list(template_options.keys()))
-        selected_template = template_options[selected_label]
-        prompt = st.text_area("Prompt", selected_template.format(prompt=""), height=300)
+
+        col11, col12 = st.columns([1, 1])
+        with col11:
+            dropdown_index = base_template_labels.index(st.session_state.template_label) \
+                if st.session_state.template_label in base_template_labels else 0
+
+            selected_label = st.selectbox(
+                "Select a prompt template",
+                base_template_labels,
+                index=dropdown_index,
+                key="template_select"
+            )
+
+        with col12:
+            temperature = st.slider(
+                "Temperature",
+                min_value=0.01,
+                max_value=2.0,
+                value=1.0,
+                step=0.01,
+                key="temp_slider"
+            )
+
+        if selected_label != st.session_state.template_label:
+            st.session_state.template_label = selected_label
+            st.session_state.original_prompt = template_options[selected_label].format(prompt="")
+
+        prompt = st.text_area("Prompt", st.session_state.original_prompt, height=300)
+
+        if prompt != st.session_state.original_prompt and st.session_state.template_label != "Custom":
+            st.session_state.template_label = "Custom"
+
+        st.markdown(f"**Prompt Source:** `{st.session_state.template_label}`")
 
         submit_disabled = not prompt.strip()
         submit_clicked = st.button("Submit", disabled=submit_disabled)
@@ -47,12 +83,18 @@ def render_ui():
         if uploaded_file:
             st.image(uploaded_file, caption="Preview", use_container_width=True)
 
-    return prompt, selected_template, uploaded_file, submit_clicked, output_placeholder
+    selected_template = template_options.get(st.session_state.template_label)
+
+    return prompt, selected_template, uploaded_file, submit_clicked, output_placeholder, temperature
 
 
-def submit_to_api(file, prompt, template, output_placeholder):
+
+def submit_to_api(file, prompt, template, output_placeholder, temperature):
     try:
-        formatted_prompt = template.format(prompt=prompt)
+        if template:
+            formatted_prompt = template.format(prompt=prompt)
+        else:
+            formatted_prompt = prompt
     except Exception as e:
         output_placeholder.error(f"Prompt formatting failed: {e}")
         return
@@ -61,7 +103,10 @@ def submit_to_api(file, prompt, template, output_placeholder):
     url = f"http://{server_url}/generate"
     headers = {"Authorization": f"Bearer {api_key}"}
     files = {"file": file}
-    data = {"prompt": formatted_prompt}
+    data = {
+        "prompt": formatted_prompt,
+        "temperature": str(temperature),
+    }
 
     try:
         with output_placeholder:
@@ -70,20 +115,20 @@ def submit_to_api(file, prompt, template, output_placeholder):
                 response.raise_for_status()
                 result = response.json()
 
-            output_placeholder.subheader("Model Response")
-            output_placeholder.text_area("Response", result["response"], height=300)
-
+            st.subheader("Model Response")
+            st.text_area("Response", result["response"], height=300)
     except requests.exceptions.RequestException as e:
         output_placeholder.error(f"Request failed: {e}")
     except ValueError:
         output_placeholder.error("Invalid JSON response from server.")
 
 
+
 def run_app():
-    prompt, selected_template, uploaded_file, submit_clicked, output_placeholder = render_ui()
+    prompt, selected_template, uploaded_file, submit_clicked, output_placeholder, temperature = render_ui()
 
     if submit_clicked and uploaded_file:
-        submit_to_api(uploaded_file, prompt, selected_template, output_placeholder)
+        submit_to_api(uploaded_file, prompt, selected_template, output_placeholder, temperature)
     elif submit_clicked and not uploaded_file:
         output_placeholder.warning("Please upload an image before submitting.")
 
