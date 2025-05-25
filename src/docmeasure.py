@@ -253,7 +253,7 @@ if __name__ == "__main__":
     print('real TEDS: ', teds)
 
     tex1 = 'Борiтеся – поборете, Вам Бог помагає!'
-    tex2 = 'борiтесь – поборете, Вам Бог помага!'
+    tex2 = 'Борiтесь – поборете, Вам Бог допомагає!'
     print('CER', calculate_cer(tex1, tex2))
     print('WER', calculate_wer(tex1, tex2))
 

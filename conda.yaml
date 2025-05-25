@@ -34,3 +34,5 @@ dependencies:
     - scipy
     - backoff
     - trl
+    - fastapi
+    - streamlit
