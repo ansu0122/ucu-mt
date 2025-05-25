@@ -25,18 +25,28 @@ def get_template_options():
         "Title Extraction": pt.get_title_template().strip(),
     }
 
+def update_template():
+    new_label = st.session_state["template_select"]
+    if new_label != st.session_state.get("template_label", ""):
+        st.session_state.template_label = new_label
+        st.session_state.original_prompt = template_options[new_label].format(prompt="")
+        st.session_state.prompt = st.session_state.original_prompt
+
+template_options = get_template_options()
 
 def render_ui():
     st.title("Ukrainian Document Adapter")
     col1, col2 = st.columns([2, 1])
 
-    template_options = get_template_options()
+    
     base_template_labels = list(template_options.keys())
 
     if "template_label" not in st.session_state:
         st.session_state.template_label = base_template_labels[0]
     if "original_prompt" not in st.session_state:
         st.session_state.original_prompt = template_options[st.session_state.template_label].format(prompt="")
+    if "prompt" not in st.session_state:
+        st.session_state.prompt = st.session_state.original_prompt
 
     with col1:
 
@@ -49,7 +59,8 @@ def render_ui():
                 "Select a prompt template",
                 base_template_labels,
                 index=dropdown_index,
-                key="template_select"
+                key="template_select",
+                on_change=update_template
             )
 
         with col12:
@@ -62,14 +73,14 @@ def render_ui():
                 key="temp_slider"
             )
 
-        if selected_label != st.session_state.template_label:
-            st.session_state.template_label = selected_label
-            st.session_state.original_prompt = template_options[selected_label].format(prompt="")
+        # Prompt input box
+        prompt = st.text_area("Prompt", st.session_state.prompt, height=300, key="prompt_textarea")
 
-        prompt = st.text_area("Prompt", st.session_state.original_prompt, height=300)
-
-        if prompt != st.session_state.original_prompt and st.session_state.template_label != "Custom":
-            st.session_state.template_label = "Custom"
+        # Detect manual edit (custom)
+        if prompt != st.session_state.prompt:
+            st.session_state.prompt = prompt
+            if prompt != st.session_state.original_prompt:
+                st.session_state.template_label = "Custom"
 
         st.markdown(f"**Prompt Source:** `{st.session_state.template_label}`")
 
